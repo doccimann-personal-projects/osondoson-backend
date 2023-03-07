@@ -5,6 +5,10 @@ import config from '../config';
 import { logger } from '../misc/logger';
 
 export class HttpServer {
+  private constructor() {
+
+  }
+
   static async of(): Promise<HttpApp> {
     const expressApp = await ExpressApp.of();
     const server = http.createServer(expressApp);

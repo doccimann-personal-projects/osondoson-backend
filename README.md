@@ -10,4 +10,6 @@ TypeScript를 이용하는 Express의 보일러플레이트 코드입니다
 npm i -g typescript 
 # node_modules 의존성 설치
 npm i
+# PM2 설치
+npm i -g pm2
 ~~~

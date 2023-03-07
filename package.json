@@ -1,0 +1,15 @@
+{
+  "name": "express-ts-boilerplate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://kdt-gitlab.elice.io/ai_track/class_06/data_project/team05/express-ts-boilerplate.git"
+  },
+  "author": "Brian",
+  "license": "ISC"
+}

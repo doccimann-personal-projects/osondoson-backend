@@ -6,6 +6,7 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/eslint-recommended"
   ],
@@ -20,6 +21,28 @@
   "rules": {
     "no-console": "off",
     "no-debugger": "warn",
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": [
+      "error",
+      {
+        "allow": [
+          "constructors"
+        ]
+      }
+    ],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^next$"
+      }
+    ],
+    "@typescript-eslint/ban-ts-comment": [
+      "error",
+      {
+        "ts-ignore": "allow-with-description"
+      }
+    ],
     "prettier/prettier": [
       "error",
       {
@@ -30,7 +53,8 @@
         "trailingComma": "all",
         "printWidth": 80,
         "bracketSpacing": true,
-        "arrowParens": "avoid"
+        "arrowParens": "always",
+        "no-empty-function": false
       }
     ]
   }

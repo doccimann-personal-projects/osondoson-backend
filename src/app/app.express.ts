@@ -6,9 +6,7 @@ import { logger } from '../misc/logger';
 import { buildFailResponse } from '../misc/util';
 
 export class ExpressApp {
-  // 생성자 접근 제한
-  private constructor() {
-  }
+  private constructor() {}
 
   // express app을 반환
   static async of(): Promise<Express> {
@@ -31,20 +29,35 @@ export class ExpressApp {
     /* 사용자 정의 Router를 위치시키는 자리 */
 
     // 허용되지 않은 요청을 처리하는 라우터
-    expressApp.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-      next(new AppError(
-        commonErrors.RESOURCE_NOT_FOUND_ERROR,
-        404,
-        `resource not found`,
-      ));
-    });
+    expressApp.use(
+      (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+      ) => {
+        next(
+          new AppError(
+            commonErrors.RESOURCE_NOT_FOUND_ERROR,
+            404,
+            `resource not found`,
+          ),
+        );
+      },
+    );
 
     // 에러 처리
-    expressApp.use((error: Error | AppError, req: express.Request, res: express.Response, next: express.NextFunction) => {
-      logger.error(error);
-      res.statusCode = error instanceof AppError ? error.httpCode : 500;
-      res.json(buildFailResponse(error.message));
-    });
+    expressApp.use(
+      (
+        error: Error | AppError,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+      ) => {
+        logger.error(error);
+        res.statusCode = error instanceof AppError ? error.httpCode : 500;
+        res.json(buildFailResponse(error.message));
+      },
+    );
 
     return expressApp;
   }

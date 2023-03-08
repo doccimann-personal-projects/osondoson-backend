@@ -5,9 +5,7 @@ import config from '../config';
 import { logger } from '../misc/logger';
 
 export class HttpServer {
-  private constructor() {
-
-  }
+  private constructor() {}
 
   static async of(): Promise<HttpApp> {
     const expressApp = await ExpressApp.of();
@@ -23,7 +21,7 @@ export class HttpServer {
       stop() {
         logger.info(`서버 중지 작업을 시작합니다.`);
 
-        // @ts-ignore
+        // @ts-ignore for describe that this backend server is shutting down. That might not occurs any errors.
         this.isShuttingDown = true;
 
         return new Promise<void>((resolve, reject) => {
@@ -39,7 +37,7 @@ export class HttpServer {
             logger.info('- DB 커넥션을 정상적으로 끊었습니다');
             logger.info('서버 중지 작업을 성공적으로 마쳤습니다.');
 
-            // @ts-ignore
+            // @ts-ignore for describe that this backend server is shutting down. That might not occurs any errors.
             this.isShuttingDown = false;
 
             resolve();

@@ -9,4 +9,3 @@ export function buildSuccessResponse<T>(data: T): AppResponse<T> {
 export function buildFailResponse(errorMessage: string): AppResponse<null> {
   return { data: null, errorMessage };
 }
-

@@ -21,6 +21,7 @@
   "rules": {
     "no-console": "off",
     "no-debugger": "warn",
+    "linebreak-style": ["error", "auto"], 
     "no-empty-function": "off",
     "@typescript-eslint/no-empty-function": [
       "error",

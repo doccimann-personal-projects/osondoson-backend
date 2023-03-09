@@ -1,15 +1,18 @@
 import express, { Express } from 'express';
 import cors from 'cors';
-import { AppError } from '../misc/error.app';
-import { commonErrors } from '../misc/error.common';
+import { AppError } from '../misc/error/error.app';
+import { commonErrors } from '../misc/error/error.common';
 import { logger } from '../misc/logger';
 import { buildFailResponse } from '../misc/util';
+import { connectPostgresql } from '../loader';
 
 export class ExpressApp {
   private constructor() {}
 
   // express app을 반환
   static async of(): Promise<Express> {
+    await connectPostgresql();
+
     const expressApp: Express = express();
 
     // CORS 설정

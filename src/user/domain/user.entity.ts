@@ -3,8 +3,9 @@ import { TimestampsEntity } from './../../misc/timestamps.entity';
 import { Role } from './vo/role.vo';
 import { Gender } from './vo/gender.vo';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IsNotEmpty, Length, Max, MaxLength } from 'class-validator';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User extends TimestampsEntity {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -12,9 +13,11 @@ export class User extends TimestampsEntity {
   @Column()
   email!: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar' })
   password!: string;
 
+  @IsNotEmpty()
+  @MaxLength(15)
   @Column({ type: 'varchar', length: 15, unique: true })
   nickname!: string;
 

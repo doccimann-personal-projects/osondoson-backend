@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { createConnection, DataSourceOptions } from 'typeorm';
+import { createConnection, DataSource, DataSourceOptions } from 'typeorm';
 import { logger } from '../misc/logger';
 import { User } from '../user/domain/user.entity';
 
-export async function connectPostgresql(): Promise<void> {
+export async function connectPostgresql(): Promise<DataSource | undefined> {
   try {
     const connectionOptions: DataSourceOptions = {
       type: 'postgres',
@@ -13,14 +13,16 @@ export async function connectPostgresql(): Promise<void> {
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DATABASE,
       entities: [User],
-      synchronize: false,
+      synchronize: true,
       logging: true,
       logger: 'advanced-console',
     };
 
-    await createConnection(connectionOptions);
+    const datasource = await createConnection(connectionOptions);
 
     logger.info('PostgreSQL 데이터베이스에 연결 완료하였습니다.');
+
+    return datasource;
   } catch (e) {
     logger.error(e);
   }

@@ -4,15 +4,17 @@ import { AppError } from '../misc/error/error.app';
 import { commonErrors } from '../misc/error/error.common';
 import { logger } from '../misc/logger';
 import { buildFailResponse } from '../misc/util';
+import { DataSource } from 'typeorm';
 import { connectPostgresql } from '../loader';
 
 export class ExpressApp {
+  public static dataSource: DataSource | undefined;
+  
   private constructor() {}
 
   // express app을 반환
   static async of(): Promise<Express> {
-    await connectPostgresql();
-
+    ExpressApp.dataSource = await connectPostgresql();
     const expressApp: Express = express();
 
     // CORS 설정

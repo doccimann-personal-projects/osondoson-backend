@@ -8,7 +8,7 @@ export class RegisterRequest extends PickType(User, [
   'nickname',
   'gender',
   'birthDate',
-]) {
+] as const) {
   role: Role = Role.USER;
 
   // register dto를 user entity로 변환하는 메소드

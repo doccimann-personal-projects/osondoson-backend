@@ -1,7 +1,24 @@
+import { getConnection } from 'typeorm';
 import { User } from './user.entity';
-import { ExpressApp } from '../../app/app.express';
-import { DataSource } from 'typeorm';
+import 'reflect-metadata';
 
-const dataSource: DataSource = ExpressApp.dataSource!;
+export class UserRepository {
+  async save(user: User): Promise<User> {
+    const connection = await getConnection();
+    return await connection.getRepository(User).save(user);
+  }
 
-export default dataSource.getRepository(User);
+  async findOneByEmail(email: string): Promise<User | null> {
+    const connection = await getConnection();
+    return await connection.getRepository(User).findOneBy({
+      email: email,
+    });
+  }
+
+  async findOneByNickname(nickname: string): Promise<User | null> {
+    const connection = await getConnection();
+    return await connection.getRepository(User).findOneBy({
+      nickname: nickname,
+    });
+  }
+}

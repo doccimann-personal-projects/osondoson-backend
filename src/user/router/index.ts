@@ -5,6 +5,6 @@ import { Router } from 'express';
 const userRouter: Router = Router();
 const userController: UserController = new UserController();
 
-userRouter.get('/register', checkCreatable, userController.signup);
+userRouter.post('/register', checkCreatable(), userController.signup);
 
 export default userRouter;

@@ -27,3 +27,7 @@ export async function connectPostgresql(): Promise<DataSource | undefined> {
     logger.error(e);
   }
 }
+
+(async () => {
+    await connectPostgresql();
+})();

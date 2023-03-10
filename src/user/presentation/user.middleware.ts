@@ -1,10 +1,11 @@
+import { UserService } from './../application/user.service';
 import { commonErrors } from './../../misc/error/error.common';
 import { AppError } from './../../misc/error/error.app';
 import { RegisterRequest } from './../application/dto/request/user.register.request';
 import express from 'express';
-import { UserService } from './../application/user.service';
+import { UserRepository } from '../domain/user.repository';
 
-const userService: UserService = new UserService();
+const userService: UserService = new UserService(new UserRepository());
 
 export const checkCreatable =
   () =>

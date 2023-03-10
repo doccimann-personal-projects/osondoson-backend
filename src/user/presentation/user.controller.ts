@@ -13,14 +13,7 @@ export class UserController {
   ) {
     const userService: UserService = new UserService(new UserRepository());
     const { email, password, nickname, gender, birthDate } = req.body;
-    const registerRequest = new RegisterRequest(
-      email,
-      password,
-      nickname,
-      gender,
-      birthDate,
-      Role.USER,
-    );
+    const registerRequest = RegisterRequest.of(req);
 
     const signUpResponse: string = await userService.signUp(registerRequest);
 

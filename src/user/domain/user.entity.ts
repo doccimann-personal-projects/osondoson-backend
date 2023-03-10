@@ -3,13 +3,14 @@ import { TimestampsEntity } from './../../misc/timestamps.entity';
 import { Role } from './vo/role.vo';
 import { Gender } from './vo/gender.vo';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IsNotEmpty, Length, Max, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, Length, Max, MaxLength } from 'class-validator';
 
 @Entity({ name: 'users' })
 export class User extends TimestampsEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @IsEmail()
   @Column()
   email!: string;
 

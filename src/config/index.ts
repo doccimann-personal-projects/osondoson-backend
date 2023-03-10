@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import { AppError } from '../misc/error.app';
-import { commonErrors } from '../misc/error.common';
+import { AppError } from '../misc/error/error.app';
+import { commonErrors } from '../misc/error/error.common';
 import { logger } from '../misc/logger';
 
 const envFound = dotenv.config();

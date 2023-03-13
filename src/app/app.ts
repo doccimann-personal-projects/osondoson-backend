@@ -1,4 +1,7 @@
 import * as http from 'http';
+import 'reflect-metadata';
+import '../loader/connection';
+import './container/container';
 import { ExpressApp } from './app.express';
 import { HttpApp } from './app.ifs';
 import config from '../config';

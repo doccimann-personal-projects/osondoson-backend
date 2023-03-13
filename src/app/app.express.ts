@@ -40,7 +40,7 @@ export class ExpressApp {
           new AppError(
             commonErrors.RESOURCE_NOT_FOUND_ERROR,
             404,
-            `resource not found`,
+            `허용되지 않은 접근입니다.`,
           ),
         );
       },

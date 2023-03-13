@@ -3,7 +3,7 @@ import { createConnection, DataSource, DataSourceOptions } from 'typeorm';
 import { logger } from '../misc/logger';
 import { User } from '../user/domain/user.entity';
 
-export async function connectPostgresql(): Promise<DataSource | undefined> {
+export async function connectPostgresql(): Promise<void> {
   try {
     const connectionOptions: DataSourceOptions = {
       type: 'postgres',
@@ -18,13 +18,12 @@ export async function connectPostgresql(): Promise<DataSource | undefined> {
       logger: 'advanced-console',
     };
 
-    const datasource = await createConnection(connectionOptions);
+    await createConnection(connectionOptions);
 
     logger.info('PostgreSQL 데이터베이스에 연결 완료하였습니다.');
-
-    return datasource;
   } catch (e) {
     logger.error(e);
+    throw e;
   }
 }
 

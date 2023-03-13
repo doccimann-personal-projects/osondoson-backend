@@ -4,7 +4,7 @@ import { RegisterRequest } from './dto/request/user.register.request';
 import * as bcrypt from 'bcrypt';
 
 export class UserService {
-  private readonly userRepository: UserRepository;
+  private userRepository: UserRepository;
 
   constructor(userRepository: UserRepository) {
     this.userRepository = userRepository;
@@ -16,7 +16,7 @@ export class UserService {
 
     const registerUser = registerRequest.toUserEntity();
 
-    const savedUser: User = await this.userRepository.save(registerUser);
+    const savedUser = await this.userRepository.save(registerUser);
 
     return 'OK';
   }

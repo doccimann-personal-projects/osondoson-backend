@@ -3,44 +3,51 @@ import { BirthDate } from './../../../domain/vo/birthdate.vo';
 import { User } from '../../../domain/user.entity';
 import { Role } from '../../../domain/vo/role.vo';
 import { Gender } from '../../../domain/vo/gender.vo';
-import { IsEmail, IsEnum, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterRequest {
   @IsString()
   @IsEmail()
-  email!: string;
+  email: string = '';
 
   @IsString()
-  password!: string;
+  password: string = '';
 
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(15)
-  nickname!: string;
+  nickname: string = '';
 
   @IsNotEmpty()
   @IsEnum(Gender)
-  gender!: Gender;
+  gender: Gender = Gender.MALE;
 
   @IsNotEmpty()
-  birthDate!: BirthDate;
+  birthDate: BirthDate = { year: 0, month: 0, day: 0 };
 
   @IsNotEmpty()
   @IsEnum(Role)
-  role!: Role;
+  role: Role = Role.USER;
 
-  static of(req: Request): RegisterRequest {
-    const {email, password, nickname, gender, birthDate, role} = req.body;
-    
-    const registerRequest = new RegisterRequest();
+  static of(req: Request, role?: Role): RegisterRequest {
+    const { email, password, nickname, gender, birthDate } = req.body;
+
+    const registerRequest = new RegisterRequest()
     registerRequest.email = email;
     registerRequest.password = password;
     registerRequest.nickname = nickname;
     registerRequest.gender = gender;
     registerRequest.birthDate = birthDate;
-    registerRequest.role = role;
-
+    registerRequest.role = role ??= Role.USER;
+    
     return registerRequest;
   }
 

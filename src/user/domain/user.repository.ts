@@ -1,7 +1,8 @@
 import { getConnection } from 'typeorm';
+import { injectable } from 'inversify';
 import { User } from './user.entity';
-import 'reflect-metadata';
 
+@injectable()
 export class UserRepository {
   async save(user: User): Promise<User> {
     return await user.save();

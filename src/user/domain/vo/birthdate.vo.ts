@@ -2,11 +2,25 @@ import { Column } from 'typeorm';
 
 export class BirthDate {
   @Column({ name: 'birth_year' })
-  year!: number;
+  readonly year: number;
 
   @Column({ name: 'birth_month' })
-  month!: number;
+  readonly month: number;
 
   @Column({ name: 'birth_day' })
-  day!: number;
+  readonly day: number;
+
+  constructor(year: number, month: number, day: number) {
+    this.year = year;
+    this.month = month;
+    this.day = day;
+  }
+
+  equals(target: BirthDate): boolean {
+    return (
+      this.year === target.year &&
+      this.month === target.month &&
+      this.day === this.day
+    );
+  }
 }

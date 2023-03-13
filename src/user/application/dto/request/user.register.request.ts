@@ -14,10 +14,12 @@ import {
 
 export class RegisterRequest {
   @IsString()
+  @IsNotEmpty()
   @IsEmail()
   email: string = '';
 
   @IsString()
+  @IsNotEmpty()
   password: string = '';
 
   @IsString()

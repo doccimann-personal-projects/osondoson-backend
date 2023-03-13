@@ -3,7 +3,7 @@ import cors from 'cors';
 import { AppError } from '../misc/error/error.app';
 import { commonErrors } from '../misc/error/error.common';
 import { logger } from '../misc/logger';
-import { buildFailResponse } from '../misc/util';
+import { buildFailResponse } from '../misc/utils/response.util';
 import userRouter from '../user/router';
 import '../loader/connection';
 

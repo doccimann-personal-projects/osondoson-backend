@@ -1,14 +1,13 @@
+import { inject, injectable } from 'inversify';
 import { UserRepository } from '../domain/user.repository';
 import { User } from '../domain/user.entity';
 import { RegisterRequest } from './dto/request/user.register.request';
 import * as bcrypt from 'bcrypt';
+import { Types } from '../../app/container/types.di';
 
+@injectable()
 export class UserService {
-  private userRepository: UserRepository;
-
-  constructor(userRepository: UserRepository) {
-    this.userRepository = userRepository;
-  }
+  constructor(@inject(Types.USER_REPOSITORY) private readonly userRepository: UserRepository) {}
 
   // 회원가입
   async signUp(registerRequest: RegisterRequest): Promise<string> {

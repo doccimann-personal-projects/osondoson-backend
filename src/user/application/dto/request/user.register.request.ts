@@ -14,10 +14,12 @@ import {
 
 export class RegisterRequest {
   @IsString()
+  @IsNotEmpty()
   @IsEmail()
   email: string = '';
 
   @IsString()
+  @IsNotEmpty()
   password: string = '';
 
   @IsString()
@@ -31,7 +33,7 @@ export class RegisterRequest {
   gender: Gender = Gender.MALE;
 
   @IsNotEmpty()
-  birthDate: BirthDate = { year: 0, month: 0, day: 0 };
+  birthDate: BirthDate = new BirthDate(0, 0, 0);
 
   @IsNotEmpty()
   @IsEnum(Role)

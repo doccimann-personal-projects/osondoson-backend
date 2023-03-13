@@ -18,5 +18,6 @@ export class TimestampsEntity extends BaseEntity {
   deletedAt: Date | null = null;
 
   // 기본 값은 false로 설정
+  @Column({ type: 'boolean' })
   isDeleted: boolean = false;
 }

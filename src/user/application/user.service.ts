@@ -16,7 +16,7 @@ export class UserService {
 
     const registerUser = registerRequest.toUserEntity();
 
-    const savedUser: User = await this.userRepository.save(registerUser);
+    const savedUser = await this.userRepository.save(registerUser);
 
     return 'OK';
   }

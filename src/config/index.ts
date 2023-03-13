@@ -10,7 +10,7 @@ if (envFound.error) {
   throw new AppError(
     commonErrors.CONFIG_ERROR,
     500,
-    "Couldn't find .env file on root folder",
+    "루트 폴더에서 .env 파일을 찾지 못했습니다.",
   );
 }
 

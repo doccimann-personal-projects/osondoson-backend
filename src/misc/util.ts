@@ -16,6 +16,15 @@ export function buildFailResponse(errorMessage: string): AppResponse<null> {
   return { data: null, errorMessage };
 }
 
+// 응답을 처리하는 미들웨어
+export function responseMiddleware(req: Request, res: Response, next: NextFunction) {
+  const responseData = res.locals.data;
+
+  const responseBody = buildSuccessResponse(responseData);
+
+  res.json(responseBody);
+}
+
 // class-validator에 의해 dto를 검증하는 함수
 export function validateBody(schema: { new (): any }) {
   return async function (req: Request, res: Response, next: NextFunction) {

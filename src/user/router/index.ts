@@ -1,3 +1,4 @@
+import { UserLoginRequest } from './../application/dto/request/user.login.request';
 import { RegisterRequest } from './../application/dto/request/user.register.request';
 import { UserController } from './../presentation/user.controller';
 import container from '../../app/container/container';
@@ -17,6 +18,13 @@ userRouter.post(
   validateBody(RegisterRequest),
   checkCreatable(),
   userController.signup,
+  responseMiddleware,
+);
+
+userRouter.post(
+  '/login',
+  validateBody(UserLoginRequest),
+  userController.login,
   responseMiddleware,
 );
 

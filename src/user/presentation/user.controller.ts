@@ -19,8 +19,7 @@ export class UserController {
       res.locals.data = signUpResponse;
       next();
     } catch (error) {
-      logger.error(error);
-      throw error;
+      next(error);
     }
   }
 
@@ -35,8 +34,7 @@ export class UserController {
       res.locals.data = loginResponse;
       next();
     } catch (error) {
-      logger.error(error);
-      throw error;
+      next(error);
     }
   }
 }

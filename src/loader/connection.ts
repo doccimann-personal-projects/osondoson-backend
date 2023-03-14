@@ -22,11 +22,10 @@ redisClient.on('error', (error) => {
   logger.error(`Redis 연결 실패: ${error}`);
 });
 
-export const getAsyncFromRedis = promisify(redisClient.get).bind(redisClient);
-
-export const setAsyncToRedis = promisify(redisClient.set).bind(redisClient);
-
-export const delAsyncFromRedis = promisify(redisClient.del).bind(redisClient);
+// Redis를 즉시 실행 함수를 통해 연결
+(async () => {
+  await redisClient.connect();
+})();
 
 // PostgreSQL
 export async function connectPostgresql(): Promise<void> {

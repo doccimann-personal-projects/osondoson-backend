@@ -1,9 +1,34 @@
 import 'dotenv/config';
-import { createConnection, DataSource, DataSourceOptions } from 'typeorm';
+import { createConnection, DataSourceOptions, getConnection } from 'typeorm';
 import { logger } from '../misc/logger';
 import { User } from '../user/domain/user.entity';
 import mongoose from 'mongoose';
+import * as Redis from 'redis';
+import { promisify } from 'util';
 
+// Redis
+export const redisClient = Redis.createClient({
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+  },
+});
+
+redisClient.on('ready', () => {
+  logger.info('Redis가 연결되었습니다.');
+});
+
+redisClient.on('error', (error) => {
+  logger.error(`Redis 연결 실패: ${error}`);
+});
+
+export const getAsyncFromRedis = promisify(redisClient.get).bind(redisClient);
+
+export const setAsyncToRedis = promisify(redisClient.set).bind(redisClient);
+
+export const delAsyncFromRedis = promisify(redisClient.del).bind(redisClient);
+
+// PostgreSQL
 export async function connectPostgresql(): Promise<void> {
   try {
     const connectionOptions: DataSourceOptions = {
@@ -28,6 +53,7 @@ export async function connectPostgresql(): Promise<void> {
   }
 }
 
+// MongoDB
 export async function connectMongoDB(): Promise<void> {
   try {
     const MongoDB_URL = process.env.MongoDB_URL;

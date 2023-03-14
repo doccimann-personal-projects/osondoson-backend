@@ -16,24 +16,24 @@ export class RegisterRequest {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
-  email: string = '';
+  email: string;
 
   @IsString()
   @IsNotEmpty()
-  password: string = '';
+  password: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(15)
-  nickname: string = '';
+  nickname: string;
 
   @IsNotEmpty()
   @IsEnum(Gender)
-  gender: Gender = Gender.MALE;
+  gender: Gender;
 
   @IsNotEmpty()
-  birthDate: BirthDate = new BirthDate(0, 0, 0);
+  birthDate: BirthDate;
 
   @IsNotEmpty()
   @IsEnum(Role)

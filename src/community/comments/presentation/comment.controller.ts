@@ -2,7 +2,7 @@ import { BoardService } from './../../boards/application/board.service';
 import { inject, injectable } from 'inversify';
 import { CommentService } from '../application/comment.service';
 import { RegisterCommentRequest } from '../application/dto/request/comment.register.request';
-import { UpdateBoardRequest } from '../application/dto/request/comment.update.request';
+import { UpdateCommentRequest } from '../application/dto/request/comment.update.request';
 import express from 'express';
 import { Types } from '../../../app/container/types.di';
 import container from '../../../app/container/container';
@@ -44,29 +44,16 @@ export class CommentController {
     res.locals.data = result;
     next();
   }
-  /*
-  async getBoard(
+
+  async updateComment(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) {
-    const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
+    const commentService = container.get<CommentService>(Types.COMMENT_SERVICE);
     const id: string = req.params.id;
-    const result = await boardService.getBoardData(id);
-
-    res.locals.data = result;
-    next();
-  }
-
-  async updateBoard(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) {
-    const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
-    const id: string = req.params.id;
-    const updateBoardRequest = UpdateBoardRequest.of(req);
-    const result = await boardService.updateBoard(id, updateBoardRequest);
+    const updateCommentRequest = UpdateCommentRequest.of(req);
+    const result = await commentService.updateComment(id, updateCommentRequest);
 
     res.locals.data = result;
     next();
@@ -77,25 +64,11 @@ export class CommentController {
     res: express.Response,
     next: express.NextFunction,
   ) {
-    const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
+    const commentService = container.get<CommentService>(Types.COMMENT_SERVICE);
     const id: string = req.params.id;
-    const result = await boardService.deleteBoard(id);
+    const result = await commentService.deleteComment(id);
 
     res.locals.data = result;
     next();
   }
-
-  async joinBoard(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) {
-    const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
-    const id: string = req.params.id;
-
-    const result = await boardService.joinBoard(id);
-
-    res.locals.data = result;
-    next();
-  } */
 }

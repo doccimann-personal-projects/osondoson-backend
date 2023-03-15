@@ -1,22 +1,18 @@
 import { Request } from 'express';
-import { IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength, IsNotEmpty } from 'class-validator';
 
-export class UpdateBoardRequest {
+export class UpdateCommentRequest {
   @IsString()
-  @MaxLength(50)
-  title: string = '';
-
-  @IsString()
-  @MaxLength(500)
+  @IsNotEmpty()
+  @MaxLength(200)
   content: string = '';
 
-  static of(req: Request): UpdateBoardRequest {
-    const { title, content } = req.body;
+  static of(req: Request): UpdateCommentRequest {
+    const { content } = req.body;
 
-    const updateBoardRequest = new UpdateBoardRequest();
-    updateBoardRequest.title = title;
-    updateBoardRequest.content = content;
+    const updateCommentRequest = new UpdateCommentRequest();
+    updateCommentRequest.content = content;
 
-    return updateBoardRequest;
+    return updateCommentRequest;
   }
 }

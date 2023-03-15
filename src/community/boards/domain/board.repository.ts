@@ -3,13 +3,17 @@ import { injectable } from 'inversify';
 
 @injectable()
 export class BoardRepository {
-  async create(boardInfo: {
-    title: string;
-    content: string;
-    totalCount: number;
-  }): Promise<object> {
+  async create(
+    sub: string,
+    boardInfo: {
+      title: string;
+      content: string;
+      totalCount: number;
+    },
+  ): Promise<object> {
     const { title, content, totalCount } = boardInfo;
     const createdNewBoard = await Boards.create({
+      authorId: sub,
       title: title,
       content: content,
       'participantInfo.totalCount': totalCount,

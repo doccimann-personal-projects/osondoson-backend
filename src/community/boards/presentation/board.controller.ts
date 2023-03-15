@@ -14,8 +14,9 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
+    const { sub } = res.locals.tokenPayload;
     const registerBoardRequest = RegisterBoardRequest.of(req);
-    const result = await boardService.createBoard(registerBoardRequest);
+    const result = await boardService.createBoard(sub, registerBoardRequest);
 
     res.locals.data = result;
     next();

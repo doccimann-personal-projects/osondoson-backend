@@ -1,11 +1,12 @@
 import { RegisterCommentRequest } from '../application/dto/request/comment.register.request';
-//import { UpdateCommentRequest } from '../application/dto/request/comment.update.request';
+import { UpdateCommentRequest } from '../application/dto/request/comment.update.request';
 import { CommentController } from '../presentation/comment.controller';
 import container from '../../../app/container/container';
 import {
   checkCreatable,
   checkBoardExist,
-  //  checkPatchable,
+  checkCommentExist,
+  checkPatchable,
 } from '../presentation/comment.middleware';
 import { Router } from 'express';
 import { responseMiddleware } from '../../../misc/utils/response.util';
@@ -35,39 +36,24 @@ commentRouter.get(
   responseMiddleware,
 );
 
-/*
-// 게시판 상세 조회
-boardRouter.get(
-  '/:id',
-  checkIdExist(),
-  boardController.getBoard,
-  responseMiddleware,
-);
-
-// 게시글 수정
-boardRouter.put(
-  '/:id',
-  checkIdExist(),
-  validateBody(UpdateBoardRequest),
+// 댓글 수정
+// access Token에 대응하는 user id와 댓글의 author-id가 다른 경우에도 에러를 내린다
+commentRouter.put(
+  '/boards/:boardId/comments/:id',
+  checkBoardExist(),
+  checkCommentExist(),
+  validateBody(UpdateCommentRequest),
   checkPatchable(),
-  boardController.updateBoard,
+  commentController.updateComment,
   responseMiddleware,
 );
 
-// 게시글 삭제
-boardRouter.delete(
-  '/:id',
-  checkIdExist(),
-  boardController.deleteBoard,
+// 댓글 삭제
+commentRouter.delete(
+  '/boards/:boardId/comments/:id',
+  checkBoardExist(),
+  checkCommentExist(),
+  commentController.deleteBoard,
   responseMiddleware,
 );
-
-// 참여 신청
-boardRouter.post(
-  '/:id/participants',
-  checkIdExist(),
-  boardController.joinBoard,
-  responseMiddleware,
-);
- */
 export default commentRouter;

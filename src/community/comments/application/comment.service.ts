@@ -2,7 +2,7 @@ import { CommentRepository } from '../domain/comment.repository';
 import { inject, injectable } from 'inversify';
 import { Comments } from '../domain/comment.entity';
 import { RegisterCommentRequest } from './dto/request/comment.register.request';
-//import { UpdateCommentRequest } from './dto/request/comment.update.request';
+import { UpdateCommentRequest } from './dto/request/comment.update.request';
 import { Types } from '../../../app/container/types.di';
 
 @injectable()
@@ -47,17 +47,10 @@ export class CommentService {
 
     return comments;
   }
-  /*
-  // 게시판 상세 조회
-  async getBoardData(id: string): Promise<object> {
-    const board = await this.boardRepository.findBoardById(id);
-
-    return board;
-  }
 
   // 해당 id의 게시글 존재 여부
   async isExistId(id: string): Promise<boolean> {
-    const board = await this.boardRepository.findBoard(id);
+    const board = await this.commentRepository.findComment(id);
     if (!board) {
       return true;
     } else {
@@ -65,35 +58,20 @@ export class CommentService {
     }
   }
 
-  // title, content 하나라도 존재하는지 확인
-  async isExistedOne(title?: string, content?: string): Promise<boolean> {
-    if (!title && !content) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  async updateBoard(
+  async updateComment(
     id: string,
-    updateBoardRequest: UpdateBoardRequest,
-  ): Promise<object | undefined> {
-    const updatedBoard = await this.boardRepository.updateById(
+    updateCommentRequest: UpdateCommentRequest,
+  ): Promise<string | undefined> {
+    const updateComment = await this.commentRepository.updateById(
       id,
-      updateBoardRequest,
+      updateCommentRequest,
     );
-    return updatedBoard;
+    return updateComment;
   }
 
-  async deleteBoard(id: string): Promise<string | undefined> {
-    const deletedBoard = await this.boardRepository.deletedById(id);
+  async deleteComment(id: string): Promise<string | undefined> {
+    const deletedBoard = await this.commentRepository.deletedById(id);
 
     return deletedBoard;
   }
-
-  async joinBoard(id: string): Promise<object | undefined> {
-    const joinedBoard = await this.boardRepository.joinedBoard(id);
-
-    return joinedBoard;
-  } */
 }

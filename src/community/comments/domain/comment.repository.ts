@@ -30,73 +30,53 @@ export class CommentRepository {
       .sort({ createdAt: 1 });
     return comments;
   }
-  /*
-  async findBoard(id: string): Promise<object | undefined> {
-    const board = await Boards.findOne({ _id: id });
-    if (!board) {
+
+  async findComment(id: string): Promise<object | undefined> {
+    const comment = await Comments.findOne({ _id: id });
+    if (!comment) {
       return;
     }
-    if (board.isDeleted == true) {
+    if (comment.isDeleted == true) {
       return;
     }
-    return board;
-  }
-
-  async findBoardById(id: string): Promise<object> {
-    const board: any = await Boards.findOne({ _id: id });
-
-    const result: object = {
-      _id: board._id,
-      title: board.title,
-      content: board.content,
-      participantInfo: board.participantInfo,
-    };
-
-    return result;
+    return comment;
   }
 
   async updateById(
     id: string,
-    updated: { title?: string; content?: string },
-  ): Promise<object | undefined> {
-    //✨const authorId = Boards.findOne(authorId);
+    updated: { content: string },
+  ): Promise<string | undefined> {
+    //✨authorId
 
     const filt = { _id: id };
     const option = { returnOriginal: false };
 
-    const updatedBoard = await Boards.findOneAndUpdate(
+    const updatedComment = await Comments.findOneAndUpdate(
       filt,
-      { title: updated.title, content: updated.content },
+      { content: updated.content },
       option,
     );
-    if (!updatedBoard) {
+    if (!updatedComment) {
       return;
     }
-    const result: object = {
-      _id: updatedBoard._id,
-      title: updatedBoard.title,
-      content: updatedBoard.content,
-      participantInfo: updatedBoard.participantInfo,
-    };
-    return result;
+
+    return 'Ok';
   }
 
   async deletedById(id: string): Promise<string | undefined> {
-    const board = await Boards.findOne({ _id: id });
-    if (!board) {
+    const comment = await Comments.findOne({ _id: id });
+    if (!comment) {
       return;
     }
     const filt = { _id: id };
     const option = { returnOriginal: false }; // false-> 바로 출력
-    const deletedAndupdate = await Boards.findOneAndUpdate(
+    const deletedAndupdate = await Comments.findOneAndUpdate(
       filt,
       {
         $unset: {
-          title: '',
           content: '',
           authorId: '',
           createdAt: '',
-          participantInfo: '',
         },
         $set: { deletedAt: Date.now(), isDeleted: true },
       },
@@ -109,46 +89,6 @@ export class CommentRepository {
 
     return 'Ok';
   }
-
-  async joinedBoard(id: string): Promise<object | undefined> {
-    const board = await Boards.findOne({ _id: id });
-    if (
-      board?.participantInfo?.totalCount &&
-      board.participantInfo.currentCount
-    ) {
-      if (
-        Number(board.participantInfo.totalCount) <=
-        Number(board.participantInfo.currentCount)
-      ) {
-        return;
-      }
-    }
-    const filt = { _id: id };
-    const option = { returnOriginal: false };
-    const joinedBoard = await Boards.findOneAndUpdate(
-      filt,
-      {
-        $inc: {
-          'participantInfo.currentCount': 1,
-        },
-        $push: {
-          'participantInfo.userIdList': 'test',
-          //✨ userId를 추가,
-        },
-      },
-      option,
-    );
-    if (!joinedBoard) {
-      return;
-    }
-    const result = {
-      _id: joinedBoard._id,
-      title: joinedBoard.title,
-      content: joinedBoard.content,
-      participantInfo: joinedBoard.participantInfo,
-    };
-    return result;
-  } */
 }
 const commentRepository = new CommentRepository();
 export { commentRepository };

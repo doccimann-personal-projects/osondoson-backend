@@ -14,9 +14,10 @@ export class BoardService {
 
   // 게시글 생성
   async createBoard(
+    sub: string,
     registerBoardRequest: RegisterBoardRequest,
   ): Promise<object> {
-    const createdNewBoard = await this.boardRepository.create({
+    const createdNewBoard = await this.boardRepository.create(sub, {
       title: registerBoardRequest.title,
       content: registerBoardRequest.content,
       totalCount: registerBoardRequest.totalCount,

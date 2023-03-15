@@ -28,6 +28,7 @@ const Board = new mongoose.Schema(
     },
     authorId: {
       type: String,
+      required: true,
     },
     isDeleted: {
       type: Boolean,
@@ -54,7 +55,7 @@ interface BoardsTypes {
   _id: mongoose.Types.ObjectId;
   title: string;
   content: string;
-  authorId?: string;
+  authorId: string;
   participantInfo?: participantInfoType;
   createdAt: Date;
   updatedAt: Date;

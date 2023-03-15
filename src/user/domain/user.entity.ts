@@ -1,7 +1,7 @@
 import { BirthDate } from './vo/birthdate.vo';
 import { TimestampsEntity } from './../../misc/timestamps.entity';
-import { Role } from './vo/role.vo';
-import { Gender } from './vo/gender.vo';
+import { Role } from './enum/role.vo';
+import { Gender } from './enum/gender.vo';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'users' })

@@ -57,7 +57,7 @@ export class ExpressApp {
         res: express.Response,
         next: express.NextFunction,
       ) => {
-        logger.error(error);
+        logger.error(error.stack);
         res.statusCode = error instanceof AppError ? error.httpCode : 500;
         res.json(buildFailResponse(error.message));
       },

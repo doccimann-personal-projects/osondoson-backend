@@ -1,4 +1,5 @@
-import { getExpTimeFromDay } from '../../misc/utils/redis.util';
+import { getRedisTtlFromDay } from '../../misc/utils/redis.util';
+import { Role } from '../domain/enum/role.vo';
 
 export type JwtLoginPayload = {
   sub: number;
@@ -6,14 +7,16 @@ export type JwtLoginPayload = {
   iat: number;
 
   exp: number;
+
+  role: Role;
 };
 
-export function generateAccessTokenPayload(sub: number): JwtLoginPayload {
-  return { sub, iat: new Date().getTime(), exp: getAccessTokenExpTime() };
+export function generateAccessTokenPayload(sub: number, role: Role): JwtLoginPayload {
+  return { sub, iat: new Date().getTime(), exp: getAccessTokenExpTime(), role };
 }
 
-export function generateRefreshTokenPayload(sub: number): JwtLoginPayload {
-  return { sub, iat: new Date().getTime(), exp: getRefreshTokenExpTime() };
+export function generateRefreshTokenPayload(sub: number, role: Role): JwtLoginPayload {
+  return { sub, iat: new Date().getTime(), exp: getRefreshTokenExpTime(), role };
 }
 
 function getAccessTokenExpTime(): number {
@@ -27,9 +30,7 @@ function getAccessTokenExpTime(): number {
 
 function getRefreshTokenExpTime(): number {
   const now = new Date().getTime();
-  const expirationTime = getExpTimeFromDay(
-    Number(process.env.REFRESH_TOKEN_EXP_DAY),
-  );
+  const expirationTime = Number(process.env.REFRESH_TOKEN_EXP_DAY) * 24 * 60 * 60 * 1000;
 
   return now + expirationTime;
 }

@@ -5,8 +5,8 @@ export function getRefreshTokenKey(userId: number): string {
 }
 
 // N일에 대한 Redis 만료 시간을 계산해서 반환해주는 함수
-export function getExpTimeFromDay(day: number): number {
-  return day * 24 * 60 * 60 * 1000;
+export function getRedisTtlFromDay(day: number): number {
+  return day * 24 * 60 * 60;
 }
 
 // Redis command 함수를 제공하는 클래스
@@ -21,5 +21,9 @@ export class RedisCache {
     }
 
     return await redisClient.set(key, value);
+  }
+
+  static async get(key: string): Promise<string | null> {
+    return await redisClient.get(key)
   }
 }

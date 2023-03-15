@@ -1,11 +1,11 @@
 import { UserLoginRequest } from './../application/dto/request/user.login.request';
-import { inject, injectable } from 'inversify';
+import { injectable } from 'inversify';
 import { UserService } from './../application/user.service';
 import { RegisterRequest } from './../application/dto/request/user.register.request';
 import { Types } from '../../app/container/types.di';
 import container from '../../app/container/container';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../misc/logger';
+import { UserRefreshRequest } from '../application/dto/request/user.refresh.request';
 
 @injectable()
 export class UserController {
@@ -34,6 +34,25 @@ export class UserController {
       res.locals.data = loginResponse;
       next();
     } catch (error) {
+      next(error);
+    }
+  }
+
+  // 리프레시 토큰을 기반으로 새로운 액세스 토큰을 발급받는 메소드
+  async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userService = container.get<UserService>(Types.USER_SERVICE);
+
+      const { sub, role } = res.locals.tokenPayload;
+      const refreshToken = req.headers.authorization!;
+
+      const refreshRequest = UserRefreshRequest.of(sub, role, refreshToken);
+
+      const refreshResponse = await userService.issueNewAccessTokenByRefreshToken(refreshRequest);
+
+      res.locals.data = refreshResponse;
+      next();
+    } catch(error) {
       next(error);
     }
   }

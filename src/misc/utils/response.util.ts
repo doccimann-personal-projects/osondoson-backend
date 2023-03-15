@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { logger } from '../logger';
 import { AppResponse } from '../response.app';
 
 // Success Response를 생성하는 함수
@@ -21,5 +22,13 @@ export function responseMiddleware(
 
   const responseBody = buildSuccessResponse(responseData);
 
+  const logMessage = getSuccessLogMessage(req, res, responseBody);
+
+  logger.info(logMessage);
   res.json(responseBody);
+}
+
+// 로깅 메시지를 반환하는 함수
+function getSuccessLogMessage(req: Request, res: Response, responseBody: any): string {
+  return `[${req.method}] ${req.originalUrl} ${res.statusCode} ${req.ip} ${JSON.stringify(responseBody)}`
 }

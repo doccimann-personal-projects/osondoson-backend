@@ -26,4 +26,9 @@ export class RedisCache {
   static async get(key: string): Promise<string | null> {
     return await redisClient.get(key)
   }
+
+  // 단 하나의 Redis 원소만을 삭제하는 메소드
+  static async deleteOne(key: string): Promise<string | null> {
+    return await redisClient.del(key) ? 'OK' : null;
+  }
 }

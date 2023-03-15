@@ -21,4 +21,11 @@ export class UserRepository {
       nickname: nickname,
     });
   }
+
+  async findById(userId: number): Promise<User | null> {
+    const connection = await getConnection();
+    return await connection.getRepository(User).findOneBy({
+      id: userId,
+    });
+  }
 }

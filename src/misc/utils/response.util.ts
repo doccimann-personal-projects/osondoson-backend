@@ -25,10 +25,18 @@ export function responseMiddleware(
   const logMessage = getSuccessLogMessage(req, res, responseBody);
 
   logger.info(logMessage);
-  res.json(responseBody);
+
+  // responseData가 null 혹은 undefined 일 경우 204 코드로 반환
+  responseData ? res.json(responseBody) : res.status(204).json(responseBody);
 }
 
 // 로깅 메시지를 반환하는 함수
-function getSuccessLogMessage(req: Request, res: Response, responseBody: any): string {
-  return `[${req.method}] ${req.originalUrl} ${res.statusCode} ${req.ip} ${JSON.stringify(responseBody)}`
+function getSuccessLogMessage(
+  req: Request,
+  res: Response,
+  responseBody: any,
+): string {
+  return `[${req.method}] ${req.originalUrl} ${res.statusCode} ${
+    req.ip
+  } ${JSON.stringify(responseBody)}`;
 }

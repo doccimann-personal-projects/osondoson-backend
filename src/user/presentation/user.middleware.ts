@@ -40,6 +40,23 @@ export const checkCreatable =
     next();
   };
 
+// 액세스 토큰을 검증해서 res.locals.tokenPayload에 넣어주는 미들웨어
+export const verifyAccessToken = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    res.locals.tokenPayload = jwt.verify(
+      req.headers.authorization!,
+      accessTokenSecret!,
+    );
+    next();
+  } catch (error) {
+    sendJwtError(error, next);
+  }
+};
+
 // 리프레시 토큰을 검증해서 res.locals.tokenPayload에 넣어주는 미들웨어
 export const verifyRefreshToken = async function (
   req: Request,
@@ -53,22 +70,18 @@ export const verifyRefreshToken = async function (
     );
     next();
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      return next(
-        new AppError(
-          commonErrors.AUTHENTICATION_ERROR,
-          401,
-          '토큰이 만료되었습니다',
-        ),
-      );
-    }
-
-    return next(
-      new AppError(
-        commonErrors.AUTHENTICATION_ERROR,
-        401,
-        '유효하지 않은 토큰입니다',
-      ),
-    );
+    sendJwtError(error, next);
   }
 };
+
+// jwt 에러를 처리하는 함수
+function sendJwtError(error: unknown, next: NextFunction) {
+  const description =
+    error instanceof jwt.TokenExpiredError
+      ? '토큰이 만료되었습니다'
+      : '유효하지 않은 토큰입니다';
+
+  return next(
+    new AppError(commonErrors.AUTHENTICATION_ERROR, 401, description),
+  );
+}

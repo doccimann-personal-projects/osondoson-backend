@@ -66,6 +66,11 @@ export class UserService {
     return new UserLoginResponse(accessToken, refreshToken);
   }
 
+  // 유저 로그아웃
+  async logout(userId: number): Promise<string | null> {
+    return await this.deleteRefreshToken(userId);
+  }
+
   // 리프레시 토큰이 올바른지 검증하고 액세스 토큰을 새로 반환해주는 메소드
   async issueNewAccessTokenByRefreshToken(userRefreshRequest: UserRefreshRequest): Promise<UserRefreshResponse> {
     const { userId, role, refreshToken } = userRefreshRequest;
@@ -131,6 +136,13 @@ export class UserService {
     const key = getRefreshTokenKey(userId);
 
     return await RedisCache.get(key);
+  }
+
+  // Redis에서 refreshToken을 삭제하는 메소드
+  private async deleteRefreshToken(userId: number): Promise<string | null> {
+    const key = getRefreshTokenKey(userId);
+
+    return await RedisCache.deleteOne(key);
   }
 
   // 유저를 검증하고, 올바른 요청이면 유저 엔티티를 반횐해주는 메소드

@@ -56,4 +56,20 @@ export class UserController {
       next(error);
     }
   }
+
+  // 유저 로그아웃을 처리하는 메소드
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userService = container.get<UserService>(Types.USER_SERVICE);
+
+      const { sub } = res.locals.tokenPayload;
+
+      const logoutResponse = await userService.logout(sub);
+
+      res.locals.data = logoutResponse;
+      next();
+    } catch(error) {
+      next(error);
+    }
+  }
 }

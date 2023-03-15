@@ -11,11 +11,16 @@ import { RegisterRequest } from './dto/request/user.register.request';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Types } from '../../app/container/types.di';
-import { getExpTimeFromDay, getRefreshTokenKey } from '../../misc/utils/redis.util';
+import {
+  getRedisTtlFromDay,
+  getRefreshTokenKey,
+} from '../../misc/utils/redis.util';
 import {
   generateAccessTokenPayload,
   generateRefreshTokenPayload,
 } from '../common/auth.utils';
+import { UserRefreshResponse } from './dto/response/user.refresh.response';
+import { UserRefreshRequest } from './dto/request/user.refresh.request';
 
 @injectable()
 export class UserService {
@@ -25,7 +30,9 @@ export class UserService {
   ) {}
 
   // Redis cache 보존 기간
-  private readonly ttl: number = getExpTimeFromDay(Number(process.env.REFRESH_TOKEN_EXP_DAY));
+  private readonly ttl: number = getRedisTtlFromDay(
+    Number(process.env.REFRESH_TOKEN_EXP_DAY),
+  );
 
   // 회원가입
   async signUp(registerRequest: RegisterRequest): Promise<string> {
@@ -42,21 +49,44 @@ export class UserService {
   async login(loginRequest: UserLoginRequest): Promise<UserLoginResponse> {
     const { email, password } = loginRequest;
 
-    // 이메일, 패스워드 검증 이후에 userId를 취득해온다
-    const userId = await this.verifyLoginRequest(email, password);
+    // 이메일, 패스워드 검증 이후에 userId, role을 취득해온다
+    const { id, role } = await this.verifyLoginRequest(email, password);
 
     // payload 생성
-    const accessTokenPayload = generateAccessTokenPayload(userId);
-    const refreshTokenPayload = generateRefreshTokenPayload(userId);
+    const accessTokenPayload = generateAccessTokenPayload(id, role);
+    const refreshTokenPayload = generateRefreshTokenPayload(id, role);
 
     // accessToken, refreshToken 생성
     const accessToken = this.generateAccessToken(accessTokenPayload);
     const refreshToken = this.generateRefreshToken(refreshTokenPayload);
 
     // redis에 refreshToken 보관
-    await this.cacheRefreshToken(userId, refreshToken);
+    await this.cacheRefreshToken(id, refreshToken);
 
     return new UserLoginResponse(accessToken, refreshToken);
+  }
+
+  // 리프레시 토큰이 올바른지 검증하고 액세스 토큰을 새로 반환해주는 메소드
+  async issueNewAccessTokenByRefreshToken(userRefreshRequest: UserRefreshRequest): Promise<UserRefreshResponse> {
+    const { userId, role, refreshToken } = userRefreshRequest;
+
+    // userId를 이용해서 redis에 저장된 리프레시 토큰을 가져온다
+    const refreshTokenFromCache = await this.getRefreshToken(userId);
+
+    if (!refreshTokenFromCache) {
+      throw new AppError(commonErrors.AUTHENTICATION_ERROR, 401, '토큰이 만료되었습니다');
+    }
+
+    // refreshToken 동일성 비교
+    if (refreshTokenFromCache !== refreshToken) {
+      throw new AppError(commonErrors.AUTHENTICATION_ERROR, 401, '올바르지 않은 토큰입니다');
+    }
+
+    // 액세스 토큰 재발급
+    const accessTokenPayload = generateAccessTokenPayload(userId, role);
+    const accessToken = this.generateAccessToken(accessTokenPayload);
+
+    return new UserRefreshResponse(accessToken);
   }
 
   // 이미 존재하는 이메일을 지닌 유저가 있는가?
@@ -96,11 +126,18 @@ export class UserService {
     return await RedisCache.set(key, token, this.ttl);
   }
 
-  // 유저를 검증하고, 올바른 요청이면 유저의 id를 반환해주는 메소드
+  // Redis로부터 refreshToken을 가져오는 메소드
+  private async getRefreshToken(userId: number): Promise<string | null> {
+    const key = getRefreshTokenKey(userId);
+
+    return await RedisCache.get(key);
+  }
+
+  // 유저를 검증하고, 올바른 요청이면 유저 엔티티를 반횐해주는 메소드
   private async verifyLoginRequest(
     email: string,
     password: string,
-  ): Promise<number> {
+  ): Promise<User> {
     // 해당 이메일이 존재하는가?
     const targetUser = await this.userRepository.findOneByEmail(email);
 
@@ -126,6 +163,6 @@ export class UserService {
       );
     }
 
-    return targetUser.id;
+    return targetUser;
   }
 }

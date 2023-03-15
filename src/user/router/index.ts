@@ -2,7 +2,7 @@ import { UserLoginRequest } from './../application/dto/request/user.login.reques
 import { RegisterRequest } from './../application/dto/request/user.register.request';
 import { UserController } from './../presentation/user.controller';
 import container from '../../app/container/container';
-import { checkCreatable } from './../presentation/user.middleware';
+import { checkCreatable, verifyRefreshToken } from './../presentation/user.middleware';
 import { Router } from 'express';
 import { responseMiddleware } from '../../misc/utils/response.util';
 import { validateBody } from '../../misc/utils/validate.util';
@@ -26,6 +26,14 @@ userRouter.post(
   validateBody(UserLoginRequest),
   userController.login,
   responseMiddleware,
+);
+
+// 리프레시 토큰을 이용해서 액세스 토큰을 새로 발급받는 endpoint 정의
+userRouter.post(
+  '/refresh', 
+  verifyRefreshToken, 
+  userController.refresh, 
+  responseMiddleware
 );
 
 export default userRouter;

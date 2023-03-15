@@ -6,6 +6,7 @@ import { logger } from '../misc/logger';
 import { buildFailResponse } from '../misc/utils/response.util';
 import userRouter from '../user/router';
 import boardRouter from '../community/boards/router';
+import commentRouter from '../community/comments/router';
 import { connectMongoDB } from '../loader/connection';
 
 export class ExpressApp {
@@ -31,6 +32,7 @@ export class ExpressApp {
     /* 사용자 정의 Router를 위치시키는 자리 */
     expressApp.use('/api/users', userRouter);
     expressApp.use('/api/boards', boardRouter);
+    expressApp.use('/api', commentRouter);
 
     // 허용되지 않은 요청을 처리하는 라우터
     expressApp.use(

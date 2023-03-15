@@ -1,5 +1,4 @@
 import { Request } from 'express';
-//import { Boards } from '../../../domain/board.entity';
 
 import {
   IsNotEmpty,

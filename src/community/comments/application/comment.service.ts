@@ -1,56 +1,39 @@
-import { BoardRepository } from './../domain/board.repository';
+import { CommentRepository } from '../domain/comment.repository';
 import { inject, injectable } from 'inversify';
-import { Boards } from '../domain/board.entity';
-import { RegisterBoardRequest } from './dto/request/board.register.request';
-import { UpdateBoardRequest } from './dto/request/board.update.request';
+import { Comments } from '../domain/comment.entity';
+import { RegisterCommentRequest } from './dto/request/comment.register.request';
+//import { UpdateCommentRequest } from './dto/request/comment.update.request';
 import { Types } from '../../../app/container/types.di';
 
 @injectable()
-export class BoardService {
+export class CommentService {
   constructor(
-    @inject(Types.BOARD_REPOSITORY)
-    private readonly boardRepository: BoardRepository,
+    @inject(Types.COMMENT_REPOSITORY)
+    private readonly commentRepository: CommentRepository,
   ) {}
 
-  // 게시글 생성
-  async createBoard(
-    registerBoardRequest: RegisterBoardRequest,
-  ): Promise<object> {
-    const createdNewBoard = await this.boardRepository.create({
-      title: registerBoardRequest.title,
-      content: registerBoardRequest.content,
-      totalCount: registerBoardRequest.totalCount,
+  // 댓글 생성
+  async createComment(
+    boardId: string,
+    registerCommentRequest: RegisterCommentRequest,
+  ): Promise<string | undefined> {
+    const createdNewComment = await this.commentRepository.create({
+      boardId: boardId,
+      content: registerCommentRequest.content,
     });
-    return createdNewBoard;
+    return createdNewComment;
   }
 
-  // title 글자 수 50자 초과 여부
-  async isMaxTitle(title: string): Promise<boolean> {
-    if (title.length > 50) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  // content 글자 수 500자 초과 여부
+  // 댓글 글자 수 200자 초과 여부
   async isMaxContent(content: string): Promise<boolean> {
-    if (content.length > 50) {
+    if (content.length > 200) {
       return true;
     } else {
       return false;
     }
   }
 
-  // totalCount(참여인원) 8명 초과 여부
-  async isMaxTotalCount(totalCount: number): Promise<boolean> {
-    if (totalCount > 8) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
+  /* 
   // 게시판 전체 조회
   async findAllBoards(page: number, limit: number): Promise<object> {
     const boards = await this.boardRepository.findAllBoards(page, limit);
@@ -105,5 +88,5 @@ export class BoardService {
     const joinedBoard = await this.boardRepository.joinedBoard(id);
 
     return joinedBoard;
-  }
+  } */
 }

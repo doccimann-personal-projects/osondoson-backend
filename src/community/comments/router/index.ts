@@ -1,31 +1,32 @@
-import { RegisterBoardRequest } from '../application/dto/request/board.register.request';
-import { UpdateBoardRequest } from '../application/dto/request/board.update.request';
-import { BoardController } from '../presentation/board.controller';
+import { RegisterCommentRequest } from '../application/dto/request/comment.register.request';
+//import { UpdateCommentRequest } from '../application/dto/request/comment.update.request';
+import { CommentController } from '../presentation/comment.controller';
 import container from '../../../app/container/container';
 import {
   checkCreatable,
-  checkIdExist,
-  checkPatchable,
-} from '../presentation/board.middleware';
+  checkBoardExist,
+  //  checkPatchable,
+} from '../presentation/comment.middleware';
 import { Router } from 'express';
 import { responseMiddleware } from '../../../misc/utils/response.util';
 import { validateBody } from '../../../misc/utils/validate.util';
 import { Types } from '../../../app/container/types.di';
 
-const boardRouter: Router = Router();
-const boardController: BoardController = container.get<BoardController>(
-  Types.BOARD_CONTROLLER,
+const commentRouter: Router = Router();
+const commentController: CommentController = container.get<CommentController>(
+  Types.COMMENT_CONTROLLER,
 );
 
-// 게시판 생성
-boardRouter.post(
-  '/',
-  validateBody(RegisterBoardRequest),
+// 댓글 생성
+commentRouter.post(
+  '/boards/:boardId/comments',
+  checkBoardExist(),
+  validateBody(RegisterCommentRequest),
   checkCreatable(),
-  boardController.createdBoard,
+  commentController.createdComment,
   responseMiddleware,
 );
-
+/* 
 // 게시판 전체 조회
 boardRouter.get('/', boardController.getAllBoards, responseMiddleware);
 
@@ -62,5 +63,5 @@ boardRouter.post(
   boardController.joinBoard,
   responseMiddleware,
 );
-
-export default boardRouter;
+ */
+export default commentRouter;

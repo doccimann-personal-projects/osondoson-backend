@@ -6,4 +6,8 @@ export const Types = {
   BOARD_REPOSITORY: 'BoardRepository',
   BOARD_SERVICE: 'BoardService',
   BOARD_CONTROLLER: 'BoardController',
+
+  COMMENT_REPOSITORY: 'CommentRepository',
+  COMMENT_SERVICE: 'CommentService',
+  COMMENT_CONTROLLER: 'CommentController',
 };

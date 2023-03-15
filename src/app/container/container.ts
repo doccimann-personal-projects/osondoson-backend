@@ -4,6 +4,9 @@ import { UserRepository } from '../../user/domain/user.repository';
 import { BoardController } from '../../community/boards/presentation/board.controller';
 import { BoardService } from '../../community/boards/application/board.service';
 import { BoardRepository } from '../../community/boards/domain/board.repository';
+import { CommentController } from '../../community/comments/presentation/comment.controller';
+import { CommentService } from '../../community/comments/application/comment.service';
+import { CommentRepository } from '../../community/comments/domain/comment.repository';
 import { Container } from 'inversify';
 import { Types } from './types.di';
 
@@ -33,5 +36,18 @@ container
 container
   .bind<BoardController>(Types.BOARD_CONTROLLER)
   .to(BoardController)
+  .inSingletonScope();
+
+container
+  .bind<CommentRepository>(Types.COMMENT_REPOSITORY)
+  .to(CommentRepository)
+  .inSingletonScope();
+container
+  .bind<CommentService>(Types.COMMENT_SERVICE)
+  .to(CommentService)
+  .inSingletonScope();
+container
+  .bind<CommentController>(Types.COMMENT_CONTROLLER)
+  .to(CommentController)
   .inSingletonScope();
 export default container;

@@ -51,6 +51,9 @@ export async function connectPostgresql(): Promise<void> {
     throw e;
   }
 }
+(async () => {
+  await connectPostgresql();
+})();
 
 // MongoDB
 export async function connectMongoDB(): Promise<void> {
@@ -68,7 +71,3 @@ export async function connectMongoDB(): Promise<void> {
     throw e;
   }
 }
-
-(async () => {
-  await connectPostgresql();
-})();

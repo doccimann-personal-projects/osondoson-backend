@@ -51,13 +51,13 @@ interface participantInfoType {
 }
 
 interface BoardsTypes {
-  _id?: mongoose.Types.ObjectId;
-  title?: string;
-  content?: string;
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  content: string;
   authorId?: mongoose.Types.ObjectId;
   participantInfo?: participantInfoType;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
   deletedAt?: Date;
   isDeleted?: boolean;
 }

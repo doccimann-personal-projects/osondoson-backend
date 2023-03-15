@@ -1,6 +1,5 @@
 import { Boards } from './board.entity';
 import { injectable } from 'inversify';
-//여기까지는 맞는거 같은데 그 뭐야 로직 검사 어디서 하니..?
 
 @injectable()
 export class BoardRepository {
@@ -8,7 +7,7 @@ export class BoardRepository {
     title: string;
     content: string;
     totalCount: number;
-  }) {
+  }): Promise<object> {
     const { title, content, totalCount } = boardInfo;
     const createdNewBoard = await Boards.create({
       title: title,
@@ -25,11 +24,7 @@ export class BoardRepository {
     return result;
   }
 
-  async findCountPages() {
-    const countPages = await Boards.countDocuments({});
-    return countPages;
-  }
-  async findAllBoards(page: number, limit: number) {
+  async findAllBoards(page: number, limit: number): Promise<object> {
     const boards = await Boards.find({ isDeleted: false })
       .skip(limit * (page - 1))
       .limit(limit)
@@ -37,25 +32,37 @@ export class BoardRepository {
     return boards;
   }
 
-  async findBoardById(id: string) {
+  async findBoard(id: string): Promise<object | undefined> {
     const board = await Boards.findOne({ _id: id });
-    // db에서 찾지 못한 경우, 에러 메시지 반환
-    // 후에 체크 해야 할 듯.
     if (!board) {
-      throw new Error('해당 id의 게시글이 없습니다');
+      return;
     }
+    if (board.isDeleted == true) {
+      return;
+    }
+    return board;
+  }
 
-    return {
+  async findBoardById(id: string): Promise<object> {
+    const board: any = await Boards.findOne({ _id: id });
+
+    const result: object = {
       _id: board._id,
       title: board.title,
       content: board.content,
       participantInfo: board.participantInfo,
     };
+
+    return result;
   }
-  async update(id: string, updated: { title?: string; content?: string }) {
+
+  async updateById(
+    id: string,
+    updated: { title?: string; content?: string },
+  ): Promise<object | undefined> {
+    //✨const authorId = Boards.findOne(authorId);
+
     const filt = { _id: id };
-    //✨✨다른 정보 어떻게 갖고오니..쿼리 날린 user의 아이디?
-    //const authorId = Boards.findOne(authorId);
     const option = { returnOriginal: false };
 
     const updatedBoard = await Boards.findOneAndUpdate(
@@ -66,67 +73,82 @@ export class BoardRepository {
     if (!updatedBoard) {
       return;
     }
-    return {
+    const result: object = {
       _id: updatedBoard._id,
       title: updatedBoard.title,
       content: updatedBoard.content,
       participantInfo: updatedBoard.participantInfo,
     };
+    return result;
   }
 
-  async deletedById(id: string) {
-    this.findBoardById(id);
+  async deletedById(id: string): Promise<string | undefined> {
+    const board = await Boards.findOne({ _id: id });
+    if (!board) {
+      return;
+    }
+    const filt = { _id: id };
+    const option = { returnOriginal: false }; // false-> 바로 출력
     const deletedAndupdate = await Boards.findOneAndUpdate(
-      { _id: id },
+      filt,
       {
         $unset: {
           title: '',
           content: '',
           authorId: '',
           createdAt: '',
-          //participantInfo 삭제 안됨. 확인해야함.
           participantInfo: '',
         },
         $set: { deletedAt: Date.now(), isDeleted: true },
       },
+      option,
     );
 
-    return deletedAndupdate;
+    if (!deletedAndupdate) {
+      return;
+    }
+
+    return 'Ok';
   }
 
-  async joinedBoard(id: string) {
-    //🎀여기에서 만약에 사전 신청 수랑 currentCount가 같으면 에러 표시?
-
+  async joinedBoard(id: string): Promise<object | undefined> {
     const board = await Boards.findOne({ _id: id });
-    // db에서 찾지 못한 경우, 에러 메시지 반환
-    // 후에 체크 해야 할 듯.
-    /*     if (!board) {
-      throw new Error('No content', 204, '해당 id의 게시글이 없습니다');
-    } */
-    /*     if (
-        board.participantInfo?.currentCount >= board.participantInfo?.totalCount
+    if (
+      board?.participantInfo?.totalCount &&
+      board.participantInfo.currentCount
+    ) {
+      if (
+        Number(board.participantInfo.totalCount) <=
+        Number(board.participantInfo.currentCount)
       ) {
-        throw new AppError('모집 완료', 204, '모집 인원이 찼습니다.');
-      } */
+        return;
+      }
+    }
+    const filt = { _id: id };
+    const option = { returnOriginal: false };
     const joinedBoard = await Boards.findOneAndUpdate(
-      { _id: id },
+      filt,
       {
         $inc: {
-          // 갯수 더하기
           'participantInfo.currentCount': 1,
         },
-        $push: { 'participantInfo.userIdList': 'test' },
+        $push: {
+          'participantInfo.userIdList': 'test',
+          //✨ userId를 추가,
+        },
       },
+      option,
     );
     if (!joinedBoard) {
       return;
     }
-    return {
+    const result = {
       _id: joinedBoard._id,
       title: joinedBoard.title,
       content: joinedBoard.content,
       participantInfo: joinedBoard.participantInfo,
     };
+    return result;
   }
 }
 const boardRepository = new BoardRepository();

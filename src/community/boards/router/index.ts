@@ -1,7 +1,12 @@
 import { RegisterBoardRequest } from '../application/dto/request/board.registerBoard.request';
+import { UpdateBoardRequest } from '../application/dto/request/board.update.request';
 import { BoardController } from '../presentation/board.controller';
 import container from '../../../app/container/container';
-import { checkCreatable } from '../presentation/board.middleware';
+import {
+  checkCreatable,
+  checkIdExist,
+  checkPatchable,
+} from '../presentation/board.middleware';
 import { Router } from 'express';
 import { responseMiddleware } from '../../../misc/utils/response.util';
 import { validateBody } from '../../../misc/utils/validate.util';
@@ -12,11 +17,49 @@ const boardController: BoardController = container.get<BoardController>(
   Types.BOARD_CONTROLLER,
 );
 
+// 게시판 생성
 boardRouter.post(
   '/',
   validateBody(RegisterBoardRequest),
   checkCreatable(),
   boardController.createdBoard,
+  responseMiddleware,
+);
+
+// 게시판 전체 조회
+boardRouter.get('/', boardController.getAllBoards, responseMiddleware);
+
+// 게시판 상세 조회
+boardRouter.get(
+  '/:id',
+  checkIdExist(),
+  boardController.getBoard,
+  responseMiddleware,
+);
+
+// 게시글 수정
+boardRouter.put(
+  '/:id',
+  checkIdExist(),
+  validateBody(UpdateBoardRequest),
+  checkPatchable(),
+  boardController.updateBoard,
+  responseMiddleware,
+);
+
+// 게시글 삭제
+boardRouter.delete(
+  '/:id',
+  checkIdExist(),
+  boardController.deleteBoard,
+  responseMiddleware,
+);
+
+// 참여 신청
+boardRouter.post(
+  '/:id/participants',
+  checkIdExist(),
+  boardController.joinBoard,
   responseMiddleware,
 );
 

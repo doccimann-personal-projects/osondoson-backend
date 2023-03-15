@@ -1,8 +1,5 @@
 import { Request } from 'express';
-//import { BirthDate } from './../../../domain/vo/birthdate.vo';
-import { Boards } from '../../../domain/board.entity';
-//import { Role } from '../../../domain/vo/role.vo';
-//import { Gender } from '../../../domain/vo/gender.vo';
+//import { Boards } from '../../../domain/board.entity';
 
 import {
   IsNotEmpty,

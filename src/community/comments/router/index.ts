@@ -26,10 +26,16 @@ commentRouter.post(
   commentController.createdComment,
   responseMiddleware,
 );
-/* 
-// 게시판 전체 조회
-boardRouter.get('/', boardController.getAllBoards, responseMiddleware);
 
+// 댓글 전체 조회
+commentRouter.get(
+  '/boards/:boardId/comments',
+  checkBoardExist(),
+  commentController.getAllComments,
+  responseMiddleware,
+);
+
+/*
 // 게시판 상세 조회
 boardRouter.get(
   '/:id',

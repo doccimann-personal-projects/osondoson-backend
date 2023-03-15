@@ -54,7 +54,7 @@ interface BoardsTypes {
   _id: mongoose.Types.ObjectId;
   title: string;
   content: string;
-  authorId?: mongoose.Types.ObjectId;
+  authorId?: string;
   participantInfo?: participantInfoType;
   createdAt: Date;
   updatedAt: Date;

@@ -47,7 +47,7 @@ export const checkBoardExist =
     const boardId: string = req.params.boardId;
 
     const isExistBoard: boolean = await boardService.isExistId(boardId);
-    if (!isExistBoard) {
+    if (isExistBoard) {
       return next(
         new AppError(
           commonErrors.INPUT_ERROR,

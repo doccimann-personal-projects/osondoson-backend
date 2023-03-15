@@ -18,15 +18,19 @@ export class CommentRepository {
     }
     return 'Ok';
   }
-  /* 
-  async findAllBoards(page: number, limit: number): Promise<object> {
-    const boards = await Boards.find({ isDeleted: false })
+
+  async findAllComments(
+    Id: string,
+    page: number,
+    limit: number,
+  ): Promise<object> {
+    const comments = await Comments.find({ boardId: Id, isDeleted: false })
       .skip(limit * (page - 1))
       .limit(limit)
-      .sort({ createdAt: -1 });
-    return boards;
+      .sort({ createdAt: 1 });
+    return comments;
   }
-
+  /*
   async findBoard(id: string): Promise<object | undefined> {
     const board = await Boards.findOne({ _id: id });
     if (!board) {

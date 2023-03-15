@@ -33,14 +33,21 @@ export class CommentService {
     }
   }
 
-  /* 
   // 게시판 전체 조회
-  async findAllBoards(page: number, limit: number): Promise<object> {
-    const boards = await this.boardRepository.findAllBoards(page, limit);
+  async findAllComments(
+    Id: string,
+    page: number,
+    limit: number,
+  ): Promise<object> {
+    const comments = await this.commentRepository.findAllComments(
+      Id,
+      page,
+      limit,
+    );
 
-    return boards;
+    return comments;
   }
-
+  /*
   // 게시판 상세 조회
   async getBoardData(id: string): Promise<object> {
     const board = await this.boardRepository.findBoardById(id);

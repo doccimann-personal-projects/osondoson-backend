@@ -1,3 +1,5 @@
+import { getConnection } from 'typeorm';
+import { redisClient } from './../loader/connection';
 import * as http from 'http';
 import 'reflect-metadata';
 import '../loader/connection';
@@ -37,6 +39,14 @@ export class HttpServer {
             }
 
             logger.info('- 들어오는 커넥션을 더 이상 받지 않겠습니다.');
+
+            // PostgreSQL과 연결 종료
+            const pgConnection = await getConnection();
+            pgConnection.destroy();
+
+            // redis 데이터베이스와 연결 종료
+            redisClient.quit();
+
             logger.info('- DB 커넥션을 정상적으로 끊었습니다');
             logger.info('서버 중지 작업을 성공적으로 마쳤습니다.');
 

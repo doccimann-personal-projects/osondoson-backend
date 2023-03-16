@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const BoardsSchema = new mongoose.Schema(
+const Board = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -21,15 +21,17 @@ const BoardsSchema = new mongoose.Schema(
       userIdList: [
         {
           type: String,
-          // default: '?'
+          unique: true,
         },
       ],
     },
     authorId: {
       type: String,
+      required: true,
     },
     isDeleted: {
       type: Boolean,
+      default: false,
     },
     deletedAt: {
       type: Date,
@@ -42,16 +44,19 @@ const BoardsSchema = new mongoose.Schema(
   },
 );
 
-export { BoardsSchema };
-
-/*
-	id: number;
-	title: string;
-	content: string;
-	participantInfo: { totalCount: number, currentCount: number, userIdList: string[] }
-	authorId: string;
-  createdAt: Date;
-	updatedAt: Date;
-	deletedAt: Date;
-	isDeleted: boolean;
-*/
+export interface BoardsTypes {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  content: string;
+  authorId?: string;
+  participantInfo: {
+    totalCount: number;
+    currentCount: number;
+    userIdList: string[];
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date;
+  isDeleted?: boolean;
+}
+export const Boards = mongoose.model<BoardsTypes>('boards', Board);

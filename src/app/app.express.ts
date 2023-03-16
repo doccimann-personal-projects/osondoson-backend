@@ -5,11 +5,14 @@ import { commonErrors } from '../misc/error/error.common';
 import { logger } from '../misc/logger';
 import { buildFailResponse } from '../misc/utils/response.util';
 import userRouter from '../user/router';
-import '../loader/connection';
+import boardRouter from '../community/boards/router';
+import commentRouter from '../community/comments/router';
+import { connectMongoDB } from '../loader/connection';
 
 export class ExpressApp {
   // express app을 반환
   static async of(): Promise<Express> {
+    await connectMongoDB();
     const expressApp: Express = express();
 
     // CORS 설정
@@ -28,6 +31,8 @@ export class ExpressApp {
 
     /* 사용자 정의 Router를 위치시키는 자리 */
     expressApp.use('/api/users', userRouter);
+    expressApp.use('/api/boards', boardRouter);
+    //expressApp.use('/api', commentRouter);
 
     // 허용되지 않은 요청을 처리하는 라우터
     expressApp.use(
@@ -54,7 +59,7 @@ export class ExpressApp {
         res: express.Response,
         next: express.NextFunction,
       ) => {
-        logger.error(error);
+        logger.error(error.stack);
         res.statusCode = error instanceof AppError ? error.httpCode : 500;
         res.json(buildFailResponse(error.message));
       },

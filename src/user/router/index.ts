@@ -47,4 +47,12 @@ userRouter.post(
   responseMiddleware,
 );
 
+// 유저의 프로필을 조회하는 endpoint 정의
+userRouter.post(
+  '/user',
+  verifyAccessToken,
+  userController.getProfile,
+  responseMiddleware,
+);
+
 export default userRouter;

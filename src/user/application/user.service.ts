@@ -1,3 +1,4 @@
+import { UserProfileResponse } from './dto/response/user.profile.response';
 import { RedisCache } from './../../misc/utils/redis.util';
 import { JwtLoginPayload } from './../common/auth.utils';
 import { commonErrors } from './../../misc/error/error.common';
@@ -92,6 +93,15 @@ export class UserService {
     const accessToken = this.generateAccessToken(accessTokenPayload);
 
     return new UserRefreshResponse(accessToken);
+  }
+
+  // userId를 이용해서 유저의 프로필을 조회하는 메소드
+  async getProfileByUserId(userId: number): Promise<UserProfileResponse | null> {
+    const foundUser = await this.userRepository.findById(userId);
+
+    const userProfileResponse = foundUser ? UserProfileResponse.fromEntity(foundUser) : null;
+
+    return userProfileResponse;
   }
 
   // 이미 존재하는 이메일을 지닌 유저가 있는가?

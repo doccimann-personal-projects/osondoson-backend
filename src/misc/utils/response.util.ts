@@ -36,7 +36,8 @@ function getSuccessLogMessage(
   res: Response,
   responseBody: any,
 ): string {
-  return `[${req.method}] ${req.originalUrl} ${res.statusCode} ${
+  const statusCode = responseBody === null ? 200 : 204;
+  return `[${req.method}] ${req.originalUrl} ${statusCode} ${
     req.ip
   } ${JSON.stringify(responseBody)}`;
 }

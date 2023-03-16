@@ -89,4 +89,21 @@ export class UserController {
       next(error);
     }
   }
+
+  // 회원탈퇴를 수행하는 메소드
+  async unRegisterUser(req: Request, res: Response, next: NextFunction) {
+    try {
+     const userService = container.get<UserService>(Types.USER_SERVICE);
+
+      const { userId } = req.params;
+      const { sub } = res.locals.tokenPayload; 
+
+      const deleteResponse = await userService.deleteUser(Number(userId), sub);
+
+      res.locals.data = deleteResponse;
+      next();
+    } catch(error) {
+      next(error);
+    }
+  }
 }

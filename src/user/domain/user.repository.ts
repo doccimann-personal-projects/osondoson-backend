@@ -28,4 +28,16 @@ export class UserRepository {
       id: userId,
     });
   }
+
+  async deleteById(userId: number): Promise<User | null> {
+     const targetUser = await this.findById(userId);
+
+     if (!targetUser) return null;
+
+     // soft-delete 정책 적용
+     targetUser.deletedAt = new Date();
+     targetUser.isDeleted = true;
+
+     return await targetUser.save();
+  }
 }

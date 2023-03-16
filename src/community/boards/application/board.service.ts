@@ -14,10 +14,10 @@ export class BoardService {
 
   // 게시글 생성
   async createBoard(
-    sub: string,
+    nickname: string,
     registerBoardRequest: RegisterBoardRequest,
   ): Promise<object> {
-    const createdNewBoard = await this.boardRepository.create(sub, {
+    const createdNewBoard = await this.boardRepository.create(nickname, {
       title: registerBoardRequest.title,
       content: registerBoardRequest.content,
       totalCount: registerBoardRequest.totalCount,
@@ -26,8 +26,8 @@ export class BoardService {
   }
 
   // title 글자 수 50자 초과 여부
-  async isMaxTitle(title: string): Promise<boolean> {
-    if (title.length > 50) {
+  async isMaxTitle(title: string | null): Promise<boolean> {
+    if (title && title.length > 50) {
       return true;
     } else {
       return false;
@@ -35,8 +35,8 @@ export class BoardService {
   }
 
   // content 글자 수 500자 초과 여부
-  async isMaxContent(content: string): Promise<boolean> {
-    if (content.length > 50) {
+  async isMaxContent(content: string | null): Promise<boolean> {
+    if (content && content.length > 50) {
       return true;
     } else {
       return false;
@@ -60,8 +60,8 @@ export class BoardService {
   }
 
   // 게시판 상세 조회
-  async getBoardData(id: string): Promise<object> {
-    const board = await this.boardRepository.findBoardById(id);
+  async getBoardData(nickname: string, id: string): Promise<object | null> {
+    const board = await this.boardRepository.findBoardById(nickname, id);
 
     return board;
   }
@@ -86,25 +86,51 @@ export class BoardService {
   }
 
   async updateBoard(
+    nickname: string,
     id: string,
     updateBoardRequest: UpdateBoardRequest,
-  ): Promise<object | undefined> {
+  ): Promise<object | null> {
     const updatedBoard = await this.boardRepository.updateById(
+      nickname,
       id,
       updateBoardRequest,
     );
     return updatedBoard;
   }
 
-  async deleteBoard(id: string): Promise<string | undefined> {
-    const deletedBoard = await this.boardRepository.deletedById(id);
+  async deleteBoard(nickname: string, id: string): Promise<string | null> {
+    const deletedBoard = await this.boardRepository.deletedById(nickname, id);
 
     return deletedBoard;
   }
 
-  async joinBoard(id: string): Promise<object | undefined> {
-    const joinedBoard = await this.boardRepository.joinedBoard(id);
+  async joinBoard(nickname: string, id: string): Promise<object | null> {
+    const joinedBoard = await this.boardRepository.joinedBoard(nickname, id);
 
     return joinedBoard;
+  }
+
+  async checkCount(id: string): Promise<boolean> {
+    const board = await this.boardRepository.findBoardForjoin(id);
+    const totalCount = board?.participantInfo.totalCount;
+    const currentCount = board?.participantInfo.currentCount;
+    // 모집 인원과 참여 인원 비교
+    if (totalCount && currentCount) {
+      if (totalCount <= currentCount) {
+        // 6 7
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async checkJoinnedList(id: string, nickname: string): Promise<boolean> {
+    const board = await this.boardRepository.findBoardForjoin(id);
+    const userIdList = board?.participantInfo.userIdList;
+    const joinnerName = nickname;
+    if (userIdList?.includes(joinnerName)) {
+      return true;
+    }
+    return false;
   }
 }

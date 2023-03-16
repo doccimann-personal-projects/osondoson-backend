@@ -6,6 +6,7 @@ import {
   checkCreatable,
   checkIdExist,
   checkPatchable,
+  checkJoinable,
 } from '../presentation/board.middleware';
 import { Router } from 'express';
 import { responseMiddleware } from '../../../misc/utils/response.util';
@@ -68,7 +69,9 @@ boardRouter.delete(
 // 참여 신청
 boardRouter.post(
   '/:id/participants',
+  verifyAccessToken,
   checkIdExist(),
+  checkJoinable(),
   boardController.joinBoard,
   responseMiddleware,
 );

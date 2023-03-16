@@ -11,7 +11,8 @@ export class UpdateBoardRequest {
   content: string = '';
 
   static of(req: Request): UpdateBoardRequest {
-    const { title, content } = req.body;
+    const title: any = req.body.title;
+    const content: any = req.body.content;
 
     const updateBoardRequest = new UpdateBoardRequest();
     updateBoardRequest.title = title;

@@ -1,25 +1,27 @@
 import { Boards } from './board.entity';
 import { injectable } from 'inversify';
+import { BoardsTypes } from './board.entity';
 
 @injectable()
 export class BoardRepository {
   async create(
-    sub: string,
+    nickname: string | null,
     boardInfo: {
       title: string;
       content: string;
       totalCount: number;
     },
-  ): Promise<object> {
+  ): Promise<BoardsTypes> {
     const { title, content, totalCount } = boardInfo;
     const createdNewBoard = await Boards.create({
-      authorId: sub,
+      authorId: nickname,
       title: title,
       content: content,
       'participantInfo.totalCount': totalCount,
+      'participantInfo.userIdList': nickname,
     });
 
-    const result: object = {
+    const result: BoardsTypes = {
       _id: createdNewBoard._id,
       title: createdNewBoard.title,
       content: createdNewBoard.content,
@@ -36,21 +38,37 @@ export class BoardRepository {
     return boards;
   }
 
-  async findBoard(id: string): Promise<object | undefined> {
-    const board = await Boards.findOne({ _id: id });
+  async findBoard(id: string): Promise<BoardsTypes | undefined> {
+    const board = await Boards.findOne({ _id: id, isDeleted: false });
     if (!board) {
-      return;
-    }
-    if (board.isDeleted == true) {
       return;
     }
     return board;
   }
 
-  async findBoardById(id: string): Promise<object> {
-    const board: any = await Boards.findOne({ _id: id });
+  async findBoardForjoin(id: string): Promise<BoardsTypes | null> {
+    const board = await Boards.findOne({ _id: id });
+    if (!board) {
+      return null;
+    }
+    const result: BoardsTypes = {
+      _id: board._id,
+      title: board.title,
+      content: board.content,
+      participantInfo: board.participantInfo,
+    };
+    return result;
+  }
 
-    const result: object = {
+  async findBoardById(
+    nickname: string,
+    id: string,
+  ): Promise<BoardsTypes | null> {
+    const board = await Boards.findOne({ _id: id, authorId: nickname });
+    if (!board) {
+      return null;
+    }
+    const result: BoardsTypes = {
       _id: board._id,
       title: board.title,
       content: board.content,
@@ -61,23 +79,21 @@ export class BoardRepository {
   }
 
   async updateById(
+    nickname: string | null,
     id: string,
     updated: { title?: string; content?: string },
-  ): Promise<object | undefined> {
-    //✨const authorId = Boards.findOne(authorId);
-
-    const filt = { _id: id };
+  ): Promise<BoardsTypes | null> {
+    const filt = { _id: id, authorId: nickname };
     const option = { returnOriginal: false };
-
     const updatedBoard = await Boards.findOneAndUpdate(
       filt,
       { title: updated.title, content: updated.content },
       option,
     );
     if (!updatedBoard) {
-      return;
+      return null;
     }
-    const result: object = {
+    const result: BoardsTypes = {
       _id: updatedBoard._id,
       title: updatedBoard.title,
       content: updatedBoard.content,
@@ -86,12 +102,8 @@ export class BoardRepository {
     return result;
   }
 
-  async deletedById(id: string): Promise<string | undefined> {
-    const board = await Boards.findOne({ _id: id });
-    if (!board) {
-      return;
-    }
-    const filt = { _id: id };
+  async deletedById(nickname: string, id: string): Promise<string | null> {
+    const filt = { _id: id, authorId: nickname };
     const option = { returnOriginal: false }; // false-> 바로 출력
     const deletedAndupdate = await Boards.findOneAndUpdate(
       filt,
@@ -107,27 +119,13 @@ export class BoardRepository {
       },
       option,
     );
-
     if (!deletedAndupdate) {
-      return;
+      return null;
     }
-
     return 'Ok';
   }
 
-  async joinedBoard(id: string): Promise<object | undefined> {
-    const board = await Boards.findOne({ _id: id });
-    if (
-      board?.participantInfo?.totalCount &&
-      board.participantInfo.currentCount
-    ) {
-      if (
-        Number(board.participantInfo.totalCount) <=
-        Number(board.participantInfo.currentCount)
-      ) {
-        return;
-      }
-    }
+  async joinedBoard(nickname: string, id: string): Promise<BoardsTypes | null> {
     const filt = { _id: id };
     const option = { returnOriginal: false };
     const joinedBoard = await Boards.findOneAndUpdate(
@@ -137,16 +135,15 @@ export class BoardRepository {
           'participantInfo.currentCount': 1,
         },
         $push: {
-          'participantInfo.userIdList': 'test',
-          //✨ userId를 추가,
+          'participantInfo.userIdList': nickname,
         },
       },
       option,
     );
     if (!joinedBoard) {
-      return;
+      return null;
     }
-    const result = {
+    const result: BoardsTypes = {
       _id: joinedBoard._id,
       title: joinedBoard.title,
       content: joinedBoard.content,

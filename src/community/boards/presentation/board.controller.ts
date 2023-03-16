@@ -5,6 +5,7 @@ import { UpdateBoardRequest } from '../application/dto/request/board.update.requ
 import express from 'express';
 import { Types } from '../../../app/container/types.di';
 import container from '../../../app/container/container';
+import { UserService } from '../../../user/application/user.service';
 
 @injectable()
 export class BoardController {
@@ -14,9 +15,15 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
-    const { sub } = res.locals.tokenPayload;
+    const userService = container.get<UserService>(Types.USER_SERVICE);
     const registerBoardRequest = RegisterBoardRequest.of(req);
-    const result = await boardService.createBoard(sub, registerBoardRequest);
+    const { sub } = res.locals.tokenPayload;
+    const user = await userService.getProfileByUserId(sub);
+    const nickname = user ? user.nickname : 'fakeNickname';
+    const result = await boardService.createBoard(
+      nickname,
+      registerBoardRequest,
+    );
 
     res.locals.data = result;
     next();
@@ -43,8 +50,12 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
+    const userService = container.get<UserService>(Types.USER_SERVICE);
     const id: string = req.params.id;
-    const result = await boardService.getBoardData(id);
+    const { sub } = res.locals.tokenPayload;
+    const user = await userService.getProfileByUserId(sub);
+    const nickname = user ? user.nickname : 'fakeNickname';
+    const result = await boardService.getBoardData(nickname, id);
 
     res.locals.data = result;
     next();
@@ -56,9 +67,17 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
+    const userService = container.get<UserService>(Types.USER_SERVICE);
     const id: string = req.params.id;
+    const { sub } = res.locals.tokenPayload;
+    const user = await userService.getProfileByUserId(sub);
+    const nickname = user ? user.nickname : 'fakeNickname';
     const updateBoardRequest = UpdateBoardRequest.of(req);
-    const result = await boardService.updateBoard(id, updateBoardRequest);
+    const result = await boardService.updateBoard(
+      nickname,
+      id,
+      updateBoardRequest,
+    );
 
     res.locals.data = result;
     next();
@@ -70,8 +89,12 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
+    const userService = container.get<UserService>(Types.USER_SERVICE);
     const id: string = req.params.id;
-    const result = await boardService.deleteBoard(id);
+    const { sub } = res.locals.tokenPayload;
+    const user = await userService.getProfileByUserId(sub);
+    const nickname = user ? user.nickname : 'fakeNickname';
+    const result = await boardService.deleteBoard(nickname, id);
 
     res.locals.data = result;
     next();
@@ -83,9 +106,12 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
+    const userService = container.get<UserService>(Types.USER_SERVICE);
     const id: string = req.params.id;
-
-    const result = await boardService.joinBoard(id);
+    const { sub } = res.locals.tokenPayload;
+    const user = await userService.getProfileByUserId(sub);
+    const nickname = user ? user.nickname : 'fakeNickname';
+    const result = await boardService.joinBoard(nickname, id);
 
     res.locals.data = result;
     next();

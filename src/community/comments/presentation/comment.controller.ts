@@ -18,7 +18,7 @@ export class CommentController {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
 
     const Id: string = req.params.boardId;
-    const getBoardId: any = await boardService.getBoardData(Id);
+    const getBoardId: any = await boardService.getBoardData(Id, Id);
     const boardId: string = getBoardId._id;
     const registerCommentRequest = RegisterCommentRequest.of(req);
     const result = await commentService.createComment(

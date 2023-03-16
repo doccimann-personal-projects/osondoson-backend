@@ -21,8 +21,7 @@ const Board = new mongoose.Schema(
       userIdList: [
         {
           type: String,
-          // 수정 예정
-          default: '작성자',
+          unique: true,
         },
       ],
     },
@@ -45,22 +44,19 @@ const Board = new mongoose.Schema(
   },
 );
 
-interface participantInfoType {
-  totalCount?: number;
-  currentCount?: number;
-  userIdList?: string[];
-}
-
-interface BoardsTypes {
+export interface BoardsTypes {
   _id: mongoose.Types.ObjectId;
   title: string;
   content: string;
-  authorId: string;
-  participantInfo?: participantInfoType;
-  createdAt: Date;
-  updatedAt: Date;
+  authorId?: string;
+  participantInfo: {
+    totalCount: number;
+    currentCount: number;
+    userIdList: string[];
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
   deletedAt?: Date;
   isDeleted?: boolean;
 }
-
 export const Boards = mongoose.model<BoardsTypes>('boards', Board);

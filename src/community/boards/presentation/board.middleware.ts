@@ -1,3 +1,4 @@
+import { BoardController } from './board.controller';
 import container from '../../../app/container/container';
 import { BoardService } from '../application/board.service';
 import { commonErrors } from '../../../misc/error/error.common';
@@ -6,6 +7,7 @@ import { RegisterBoardRequest } from '../application/dto/request/board.register.
 import { UpdateBoardRequest } from '../application/dto/request/board.update.request';
 import express from 'express';
 import { Types } from '../../../app/container/types.di';
+import { UserService } from '../../../user/application/user.service';
 
 const boardService: BoardService = container.get(Types.BOARD_SERVICE);
 
@@ -99,8 +101,8 @@ export const checkPatchable =
 
     // title, content 하나라도 존재하는지 확인
     const isExistedOne: boolean = await boardService.isExistedOne(
-      updateBoardRequest.title,
-      updateBoardRequest.content,
+      updateBoardRequest?.title,
+      updateBoardRequest?.content,
     );
     if (isExistedOne) {
       return next(
@@ -110,33 +112,62 @@ export const checkPatchable =
           `title, content 둘 중 하나는 존재해야합니다.`,
         ),
       );
-    } else {
-      // title 글자수 제한(50)
-      const isMaxTitle: boolean = await boardService.isMaxTitle(
-        updateBoardRequest.title,
+    }
+    // title 글자수 제한(50)
+    const isMaxTitle: boolean = await boardService.isMaxTitle(
+      updateBoardRequest.title,
+    );
+    if (isMaxTitle) {
+      return next(
+        new AppError(
+          commonErrors.INPUT_ERROR,
+          400,
+          `제목은 50자까지만 허용합니다.`,
+        ),
       );
-      if (isMaxTitle) {
-        return next(
-          new AppError(
-            commonErrors.INPUT_ERROR,
-            400,
-            `제목은 50자까지만 허용합니다.`,
-          ),
-        );
-      }
-      // content 글자수 제한(500)
-      const isMaxContent: boolean = await boardService.isMaxContent(
-        updateBoardRequest.content,
+    }
+    // content 글자수 제한(500)
+    const isMaxContent: boolean = await boardService.isMaxContent(
+      updateBoardRequest.content,
+    );
+    if (isMaxContent) {
+      return next(
+        new AppError(
+          commonErrors.INPUT_ERROR,
+          400,
+          `본문은 50자까지만 허용합니다.`,
+        ),
       );
-      if (isMaxContent) {
-        return next(
-          new AppError(
-            commonErrors.INPUT_ERROR,
-            400,
-            `본문은 50자까지만 허용합니다.`,
-          ),
-        );
-      }
+    }
+    next();
+  };
+
+export const checkJoinable =
+  () =>
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    const userService = container.get<UserService>(Types.USER_SERVICE);
+    const { sub } = res.locals.tokenPayload;
+    const user = await userService.getProfileByUserId(sub);
+    const nickname = user ? user.nickname : 'fakeNickname';
+    const id: string = req.params.id;
+    const checkCount = await boardService.checkCount(id);
+    const checkJoinnedList = await boardService.checkJoinnedList(id, nickname);
+
+    // 사전 설정된 참여자 수와 현재 신청자 수 비교
+    if (checkCount) {
+      return next(
+        new AppError(commonErrors.INPUT_ERROR, 400, `모집 정원이 다 찼습니다.`),
+      );
+    }
+    // 중복 신청 여부 확인
+    if (checkJoinnedList) {
+      return next(
+        new AppError(commonErrors.INPUT_ERROR, 400, `이미 신청하였습니다.`),
+      );
     }
     next();
   };

@@ -7,6 +7,10 @@ import { BoardRepository } from '../../community/boards/domain/board.repository'
 import { CommentController } from '../../community/comments/presentation/comment.controller';
 import { CommentService } from '../../community/comments/application/comment.service';
 import { CommentRepository } from '../../community/comments/domain/comment.repository';
+
+import { LetterRepository } from '../../letter/domain/letter.repository';
+import { LetterController } from '../../letter/presentation/letter.controller';
+import { LetterService } from '../../letter/application/letter.service';
 import { Container } from 'inversify';
 import { Types } from './types.di';
 
@@ -50,4 +54,18 @@ container
   .bind<CommentController>(Types.COMMENT_CONTROLLER)
   .to(CommentController)
   .inSingletonScope();
+
+container
+  .bind<LetterRepository>(Types.LETTER_REPOSITORY)
+  .to(LetterRepository)
+  .inSingletonScope();
+container
+  .bind<LetterController>(Types.LETTER_CONTROLLER)
+  .to(LetterController)
+  .inSingletonScope()
+
+container
+  .bind<LetterService>(Types.LETTER_SERVICE)
+  .to(LetterService)
+  .inSingletonScope()
 export default container;

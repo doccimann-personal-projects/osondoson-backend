@@ -17,6 +17,7 @@ const userController: UserController = container.get<UserController>(
   Types.USER_CONTROLLER,
 );
 
+// 회원가입
 userRouter.post(
   '/register',
   validateBody(RegisterRequest),
@@ -25,6 +26,7 @@ userRouter.post(
   responseMiddleware,
 );
 
+// 로그인
 userRouter.post(
   '/login',
   validateBody(UserLoginRequest),
@@ -52,6 +54,14 @@ userRouter.post(
   '/user',
   verifyAccessToken,
   userController.getProfile,
+  responseMiddleware,
+);
+
+// 유저를 회원탈퇴하는 endpoint 정의
+userRouter.delete(
+  '/:userId',
+  verifyAccessToken,
+  userController.unRegisterUser,
   responseMiddleware,
 );
 

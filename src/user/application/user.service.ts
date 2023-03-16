@@ -73,19 +73,29 @@ export class UserService {
   }
 
   // 리프레시 토큰이 올바른지 검증하고 액세스 토큰을 새로 반환해주는 메소드
-  async issueNewAccessTokenByRefreshToken(userRefreshRequest: UserRefreshRequest): Promise<UserRefreshResponse> {
+  async issueNewAccessTokenByRefreshToken(
+    userRefreshRequest: UserRefreshRequest,
+  ): Promise<UserRefreshResponse> {
     const { userId, role, refreshToken } = userRefreshRequest;
 
     // userId를 이용해서 redis에 저장된 리프레시 토큰을 가져온다
     const refreshTokenFromCache = await this.getRefreshToken(userId);
 
     if (!refreshTokenFromCache) {
-      throw new AppError(commonErrors.AUTHENTICATION_ERROR, 401, '토큰이 만료되었습니다');
+      throw new AppError(
+        commonErrors.AUTHENTICATION_ERROR,
+        401,
+        '토큰이 만료되었습니다',
+      );
     }
 
     // refreshToken 동일성 비교
     if (refreshTokenFromCache !== refreshToken) {
-      throw new AppError(commonErrors.AUTHENTICATION_ERROR, 401, '올바르지 않은 토큰입니다');
+      throw new AppError(
+        commonErrors.AUTHENTICATION_ERROR,
+        401,
+        '올바르지 않은 토큰입니다',
+      );
     }
 
     // 액세스 토큰 재발급
@@ -96,12 +106,39 @@ export class UserService {
   }
 
   // userId를 이용해서 유저의 프로필을 조회하는 메소드
-  async getProfileByUserId(userId: number): Promise<UserProfileResponse | null> {
+  async getProfileByUserId(
+    userId: number,
+  ): Promise<UserProfileResponse | null> {
     const foundUser = await this.userRepository.findById(userId);
 
-    const userProfileResponse = foundUser ? UserProfileResponse.fromEntity(foundUser) : null;
+    // foundUser가 삭제되지 않아야하고, null이 아니여야만 UserProfileResponse를 생성한다
+    const userProfileResponse =
+      foundUser && foundUser.isDeleted === false
+        ? UserProfileResponse.fromEntity(foundUser)
+        : null;
 
     return userProfileResponse;
+  }
+
+  // 유저를 삭제하는 메소드
+  async deleteUser(userId: number, sub: number): Promise<string | null> {
+    // 만일 토큰에 있는 userId와 param으로 부터 받아온 userId가 일치하지 않으면 예외 처리
+    if (userId !== sub) {
+      throw new AppError(commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
+    }
+
+    const deletedUser = await this.userRepository.deleteById(userId);
+
+    // 만일 삭제에 실패하면 false를 바로 반환한다
+    if (!deletedUser) {
+      return null;
+    }
+
+    // redis 상에 존재하는 리프레시 토큰을 삭제한다
+    await this.deleteRefreshToken(userId);
+
+    // 결과 반환
+    return 'OK';
   }
 
   // 이미 존재하는 이메일을 지닌 유저가 있는가?

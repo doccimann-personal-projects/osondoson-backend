@@ -50,4 +50,5 @@ container
   .bind<CommentController>(Types.COMMENT_CONTROLLER)
   .to(CommentController)
   .inSingletonScope();
+
 export default container;

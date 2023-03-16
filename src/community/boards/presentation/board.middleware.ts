@@ -34,7 +34,6 @@ export const checkCreatable =
         ),
       );
     }
-
     // content 글자수 제한(500)
     const isMaxContent: boolean = await boardService.isMaxContent(
       registerBoardRequest.content,
@@ -48,7 +47,6 @@ export const checkCreatable =
         ),
       );
     }
-
     // 참여신청 인원 제한(8)
     const isMaxTotalCount: boolean = await boardService.isMaxTotalCount(
       registerBoardRequest.totalCount,
@@ -75,7 +73,6 @@ export const checkIdExist =
     const id: string = req.params.id;
 
     // 해당 id의 게시글 존재 여부
-    // 🚩
     const isExistId: boolean = await boardService.isExistId(id);
     if (isExistId) {
       return next(
@@ -163,7 +160,7 @@ export const checkJoinable =
         new AppError(commonErrors.INPUT_ERROR, 400, `모집 정원이 다 찼습니다.`),
       );
     }
-    // 중복 신청 여부 확인
+    // 참여 신청자 중복 여부 확인
     if (checkJoinnedList) {
       return next(
         new AppError(commonErrors.INPUT_ERROR, 400, `이미 신청하였습니다.`),

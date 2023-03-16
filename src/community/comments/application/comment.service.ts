@@ -14,23 +14,21 @@ export class CommentService {
 
   // 댓글 생성
   async createComment(
+    nickname: string,
     boardId: string,
     registerCommentRequest: RegisterCommentRequest,
-  ): Promise<string | undefined> {
+  ): Promise<string | null> {
     const createdNewComment = await this.commentRepository.create({
+      authorId: nickname,
       boardId: boardId,
       content: registerCommentRequest.content,
     });
     return createdNewComment;
   }
 
-  // 댓글 글자 수 200자 초과 여부
+  // 댓글 글자수 제한(200)
   async isMaxContent(content: string): Promise<boolean> {
-    if (content.length > 200) {
-      return true;
-    } else {
-      return false;
-    }
+    return content.length > 200 ? true : false;
   }
 
   // 게시판 전체 조회
@@ -44,24 +42,28 @@ export class CommentService {
       page,
       limit,
     );
-
     return comments;
   }
 
-  // 해당 id의 게시글 존재 여부
+  // 댓글 존재 여부 확인
   async isExistId(id: string): Promise<boolean> {
-    const board = await this.commentRepository.findComment(id);
-    if (!board) {
-      return true;
-    } else {
-      return false;
-    }
+    const comment = await this.commentRepository.findCommentById(id);
+    return comment ? false : true;
   }
 
+  // 댓글에 대한 접근 권한 확인
+  async isUserComment(nickname: string): Promise<boolean> {
+    const comment = await this.commentRepository.findCommentByNickname(
+      nickname,
+    );
+    return comment ? false : true;
+  }
+
+  // 댓글 수정
   async updateComment(
     id: string,
     updateCommentRequest: UpdateCommentRequest,
-  ): Promise<string | undefined> {
+  ): Promise<string | null> {
     const updateComment = await this.commentRepository.updateById(
       id,
       updateCommentRequest,
@@ -69,9 +71,9 @@ export class CommentService {
     return updateComment;
   }
 
-  async deleteComment(id: string): Promise<string | undefined> {
+  // 댓글 삭제
+  async deleteComment(id: string): Promise<string | null> {
     const deletedBoard = await this.commentRepository.deletedById(id);
-
     return deletedBoard;
   }
 }

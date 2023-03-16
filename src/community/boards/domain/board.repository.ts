@@ -20,7 +20,6 @@ export class BoardRepository {
       'participantInfo.totalCount': totalCount,
       'participantInfo.userIdList': nickname,
     });
-
     const result: BoardsTypes = {
       _id: createdNewBoard._id,
       title: createdNewBoard.title,
@@ -38,7 +37,7 @@ export class BoardRepository {
     return boards;
   }
 
-  async findBoard(id: string): Promise<BoardsTypes | undefined> {
+  async findBoardBool(id: string): Promise<BoardsTypes | undefined> {
     const board = await Boards.findOne({ _id: id, isDeleted: false });
     if (!board) {
       return;

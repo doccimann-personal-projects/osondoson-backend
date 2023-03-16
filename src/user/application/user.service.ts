@@ -124,7 +124,11 @@ export class UserService {
   async deleteUser(userId: number, sub: number): Promise<string | null> {
     // 만일 토큰에 있는 userId와 param으로 부터 받아온 userId가 일치하지 않으면 예외 처리
     if (userId !== sub) {
-      throw new AppError(commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
+      throw new AppError(
+        commonErrors.INPUT_ERROR,
+        400,
+        '잘못된 유저 정보입니다.',
+      );
     }
 
     const deletedUser = await this.userRepository.deleteById(userId);
@@ -161,11 +165,19 @@ export class UserService {
 
   // 토큰을 생성하는 메소드
   private generateAccessToken(payload: JwtLoginPayload): string {
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!);
+    const accessTokenExpIn = `${process.env.ACCESS_TOKEN_EXP_HOUR}h`;
+
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, {
+      expiresIn: accessTokenExpIn,
+    });
   }
 
   private generateRefreshToken(payload: JwtLoginPayload): string {
-    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!);
+    const refreshTokenExpIn = `${process.env.REFRESH_TOKEN_EXP_DAY}d`;
+
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
+      expiresIn: refreshTokenExpIn,
+    });
   }
 
   // Redis에 refreshToken을 보관하는 메소드

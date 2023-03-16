@@ -48,11 +48,12 @@ export class UserController {
 
       const refreshRequest = UserRefreshRequest.of(sub, role, refreshToken);
 
-      const refreshResponse = await userService.issueNewAccessTokenByRefreshToken(refreshRequest);
+      const refreshResponse =
+        await userService.issueNewAccessTokenByRefreshToken(refreshRequest);
 
       res.locals.data = refreshResponse;
       next();
-    } catch(error) {
+    } catch (error) {
       next(error);
     }
   }
@@ -68,7 +69,23 @@ export class UserController {
 
       res.locals.data = logoutResponse;
       next();
-    } catch(error) {
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // 유저 프로파일 조회를 처리하는 메소드
+  async getProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userService = container.get<UserService>(Types.USER_SERVICE);
+
+      const { sub } = res.locals.tokenPayload;
+
+      const profileResponse = await userService.getProfileByUserId(sub);
+
+      res.locals.data = profileResponse;
+      next();
+    } catch (error) {
       next(error);
     }
   }

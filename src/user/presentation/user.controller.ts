@@ -1,3 +1,4 @@
+import { UserUpdateRequest } from './../application/dto/request/user.update.request';
 import { UserLoginRequest } from './../application/dto/request/user.login.request';
 import { injectable } from 'inversify';
 import { UserService } from './../application/user.service';
@@ -101,6 +102,23 @@ export class UserController {
       const deleteResponse = await userService.deleteUser(Number(userId), sub);
 
       res.locals.data = deleteResponse;
+      next();
+    } catch(error) {
+      next(error);
+    }
+  }
+
+  async updateUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userService = container.get<UserService>(Types.USER_SERVICE);
+
+      const { userId } = req.params;
+      const { sub } = res.locals.tokenPayload;
+      
+      const updateRequest = UserUpdateRequest.of(req);
+      const updateResult = await userService.updateUserInfo(sub, Number(userId), updateRequest);
+
+      res.locals.data = updateResult;
       next();
     } catch(error) {
       next(error);

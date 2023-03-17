@@ -4,6 +4,7 @@ import { UserController } from './../presentation/user.controller';
 import container from '../../app/container/container';
 import {
   checkCreatable,
+  checkUpdatable,
   verifyAccessToken,
   verifyRefreshToken,
 } from './../presentation/user.middleware';
@@ -63,6 +64,15 @@ userRouter.delete(
   verifyAccessToken,
   userController.unRegisterUser,
   responseMiddleware,
+);
+
+// 회원 정보 수정
+userRouter.put(
+  '/:userId', 
+  verifyAccessToken, 
+  checkUpdatable, 
+  userController.updateUser, 
+  responseMiddleware
 );
 
 export default userRouter;

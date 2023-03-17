@@ -1,3 +1,4 @@
+import { UserUpdateRequest } from './../application/dto/request/user.update.request';
 import container from '../../app/container/container';
 import { UserService } from './../application/user.service';
 import { commonErrors } from './../../misc/error/error.common';
@@ -39,6 +40,18 @@ export const checkCreatable =
 
     next();
   };
+
+// 업데이트가 가능한지 검증하는 미들웨어
+export const checkUpdatable = async function(req: Request, res: Response, next: NextFunction) {
+  const { nickname } = req.body;
+
+  // 이미 존재하는 닉네임인지 검증한다
+  if (nickname) {
+    await verifyIsExistNickname(nickname, next);
+  }
+
+  next();
+}
 
 // 액세스 토큰을 검증해서 res.locals.tokenPayload에 넣어주는 미들웨어
 export const verifyAccessToken = async function (
@@ -84,4 +97,16 @@ function sendJwtError(error: unknown, next: NextFunction) {
   return next(
     new AppError(commonErrors.AUTHENTICATION_ERROR, 401, description),
   );
+}
+
+// 닉네임 검증 함수
+async function verifyIsExistNickname(nickname: string, next: NextFunction) {
+  const isAlreadyExistNickname: boolean =
+      await userService.isAlreadyExistNickname(nickname);
+
+    if (isAlreadyExistNickname) {
+      return next(
+        new AppError(commonErrors.INPUT_ERROR, 400, `중복된 닉네임입니다`),
+      );
+    }
 }

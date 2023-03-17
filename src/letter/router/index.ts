@@ -11,11 +11,11 @@ const letterRouter : Router = Router();
 const letterController : LetterController = container.get<LetterController>(Types.LETTER_CONTROLLER,);
 
 letterRouter.post(
-    '/',
+    '/make',
     validateBody(CreateRequest),
     checkCreatable(),
     letterController.makeLetter,
     responseMiddleware,
-)
+);
 
 export default letterRouter;

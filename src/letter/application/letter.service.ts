@@ -5,16 +5,17 @@ import { Types } from '../../app/container/types.di';
 import { AppError } from '../../misc/error/error.app';
 import { commonErrors } from '../../misc/error/error.common';
 import { LetterRepository } from '../domain/letter.repository';
+import { LetterResponse } from './DTO/Response/letter.create.response';
 
 @injectable()
 export class LetterService {
-    constructor(@inject(Types.LETTER_REPOSITORY) private readonly letterRepository : LetterRepository) {}
+    constructor(@inject(Types.LETTER_REPOSITORY) 
+    private readonly letterRepository : LetterRepository) {}
 
-    async create(createRequest : CreateRequest) : Promise<string> {
-        const createLetter = createRequest.toLetterEntity();
-        const saveLetter = await this.letterRepository.create(createLetter)
+    async create(createRequest : CreateRequest) : Promise<LetterResponse> {
+        const { receiverId, content } = createRequest;
         
-        return 'OK'
+        return new LetterResponse ( receiverId, content);
     }
     // 쪽지 글자 수 200자 초과여부
     async isMaxContent(content : string) : Promise<boolean> {

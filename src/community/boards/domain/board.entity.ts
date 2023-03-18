@@ -21,7 +21,6 @@ const Board = new mongoose.Schema(
       userIdList: [
         {
           type: String,
-          unique: true,
         },
       ],
     },

@@ -12,6 +12,7 @@ import { Router } from 'express';
 import { responseMiddleware } from '../../../misc/utils/response.util';
 import { validateBody } from '../../../misc/utils/validate.util';
 import { Types } from '../../../app/container/types.di';
+import { verifyAccessToken } from './../../../user/presentation/user.middleware';
 
 const commentRouter: Router = Router();
 const commentController: CommentController = container.get<CommentController>(
@@ -21,6 +22,7 @@ const commentController: CommentController = container.get<CommentController>(
 // 댓글 생성
 commentRouter.post(
   '/boards/:boardId/comments',
+  verifyAccessToken,
   checkBoardExist(),
   validateBody(RegisterCommentRequest),
   checkCreatable(),
@@ -31,15 +33,16 @@ commentRouter.post(
 // 댓글 전체 조회
 commentRouter.get(
   '/boards/:boardId/comments',
+  verifyAccessToken,
   checkBoardExist(),
   commentController.getAllComments,
   responseMiddleware,
 );
 
 // 댓글 수정
-// access Token에 대응하는 user id와 댓글의 author-id가 다른 경우에도 에러를 내린다
 commentRouter.put(
   '/boards/:boardId/comments/:id',
+  verifyAccessToken,
   checkBoardExist(),
   checkCommentExist(),
   validateBody(UpdateCommentRequest),
@@ -51,6 +54,7 @@ commentRouter.put(
 // 댓글 삭제
 commentRouter.delete(
   '/boards/:boardId/comments/:id',
+  verifyAccessToken,
   checkBoardExist(),
   checkCommentExist(),
   commentController.deleteBoard,

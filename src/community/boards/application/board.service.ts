@@ -27,29 +27,17 @@ export class BoardService {
 
   // title 글자 수 50자 초과 여부
   async isMaxTitle(title: string | null): Promise<boolean> {
-    if (title && title.length > 50) {
-      return true;
-    } else {
-      return false;
-    }
+    return title && title.length > 50 ? true : false;
   }
 
   // content 글자 수 500자 초과 여부
   async isMaxContent(content: string | null): Promise<boolean> {
-    if (content && content.length > 50) {
-      return true;
-    } else {
-      return false;
-    }
+    return content && content.length > 50 ? true : false;
   }
 
   // totalCount(참여인원) 8명 초과 여부
   async isMaxTotalCount(totalCount: number): Promise<boolean> {
-    if (totalCount > 8) {
-      return true;
-    } else {
-      return false;
-    }
+    return totalCount > 8 ? true : false;
   }
 
   // 게시판 전체 조회
@@ -60,31 +48,30 @@ export class BoardService {
   }
 
   // 게시판 상세 조회
-  async getBoardData(nickname: string, id: string): Promise<object | null> {
-    const board = await this.boardRepository.findBoardById(nickname, id);
+  async getBoardData(id: string): Promise<object | null> {
+    const board = await this.boardRepository.findBoardById(id);
 
     return board;
   }
 
   // 해당 id의 게시글 존재 여부
   async isExistId(id: string): Promise<boolean> {
-    const board = await this.boardRepository.findBoard(id);
-    if (!board) {
-      return true;
-    } else {
-      return false;
-    }
+    const board = await this.boardRepository.findBoardBool(id);
+    return board ? false : true;
   }
 
   // title, content 하나라도 존재하는지 확인
   async isExistedOne(title?: string, content?: string): Promise<boolean> {
-    if (!title && !content) {
-      return true;
-    } else {
-      return false;
-    }
+    return !title && !content ? true : false;
   }
 
+  // 접근 권한 확인(본인 글인지 확인)
+  async isYours(nickname:string):Promise<boolean>{
+    const isyours=await this.boardRepository.findBoardByNickname(nickname);
+    return isyours ? false:true;
+  }
+
+  // 게시판 수정
   async updateBoard(
     nickname: string,
     id: string,
@@ -98,32 +85,32 @@ export class BoardService {
     return updatedBoard;
   }
 
+  // 게시판 삭제
   async deleteBoard(nickname: string, id: string): Promise<string | null> {
     const deletedBoard = await this.boardRepository.deletedById(nickname, id);
-
     return deletedBoard;
   }
 
+  // 게시판-참여 신청
   async joinBoard(nickname: string, id: string): Promise<object | null> {
     const joinedBoard = await this.boardRepository.joinedBoard(nickname, id);
-
     return joinedBoard;
   }
 
+  // 게시판-참여 조건 확인
   async checkCount(id: string): Promise<boolean> {
     const board = await this.boardRepository.findBoardForjoin(id);
     const totalCount = board?.participantInfo.totalCount;
     const currentCount = board?.participantInfo.currentCount;
-    // 모집 인원과 참여 인원 비교
+    // 사전 설정된 참여자 수와 현재 신청자 수 비교
     if (totalCount && currentCount) {
       if (totalCount <= currentCount) {
-        // 6 7
         return true;
       }
     }
     return false;
   }
-
+  // 참여 신청자 중복 여부 확인
   async checkJoinnedList(id: string, nickname: string): Promise<boolean> {
     const board = await this.boardRepository.findBoardForjoin(id);
     const userIdList = board?.participantInfo.userIdList;
@@ -132,5 +119,11 @@ export class BoardService {
       return true;
     }
     return false;
+  }
+
+  async getBoardByOnlyId(id: string): Promise<object | null> {
+    const board = await this.boardRepository.findBoardForjoin(id);
+
+    return board;
   }
 }

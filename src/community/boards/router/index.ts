@@ -7,6 +7,7 @@ import {
   checkIdExist,
   checkPatchable,
   checkJoinable,
+  CheckIsYours
 } from '../presentation/board.middleware';
 import { Router } from 'express';
 import { responseMiddleware } from '../../../misc/utils/response.util';
@@ -51,6 +52,7 @@ boardRouter.put(
   '/:id',
   verifyAccessToken,
   checkIdExist(),
+  CheckIsYours(),
   validateBody(UpdateBoardRequest),
   checkPatchable(),
   boardController.updateBoard,
@@ -62,6 +64,7 @@ boardRouter.delete(
   '/:id',
   verifyAccessToken,
   checkIdExist(),
+  CheckIsYours(),
   boardController.deleteBoard,
   responseMiddleware,
 );

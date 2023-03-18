@@ -4,17 +4,20 @@ import { injectable } from 'inversify';
 @injectable()
 export class CommentRepository {
   async create(commentInfo: {
+    authorId: string;
     boardId: string;
     content: string;
-  }): Promise<string | undefined> {
+  }): Promise<string | null> {
+    const authorId: string = commentInfo.authorId;
     const content: string = commentInfo.content;
     const boardId: string = commentInfo.boardId;
     const createdNewComment = await Comments.create({
-      content: content,
-      boardId: boardId,
+      authorId,
+      content,
+      boardId,
     });
     if (!createdNewComment) {
-      return;
+      return null;
     }
     return 'Ok';
   }
@@ -31,13 +34,24 @@ export class CommentRepository {
     return comments;
   }
 
-  async findComment(id: string): Promise<object | undefined> {
+  async findCommentById(id: string): Promise<object | null> {
     const comment = await Comments.findOne({ _id: id });
     if (!comment) {
-      return;
+      return null;
     }
     if (comment.isDeleted == true) {
-      return;
+      return null;
+    }
+    return comment;
+  }
+
+  async findCommentByNickname(nickname: string): Promise<object | null> {
+    const comment = await Comments.findOne({ authorId: nickname });
+    if (!comment) {
+      return null;
+    }
+    if (comment.isDeleted == true) {
+      return null;
     }
     return comment;
   }
@@ -45,9 +59,7 @@ export class CommentRepository {
   async updateById(
     id: string,
     updated: { content: string },
-  ): Promise<string | undefined> {
-    //✨authorId
-
+  ): Promise<string | null> {
     const filt = { _id: id };
     const option = { returnOriginal: false };
 
@@ -57,16 +69,15 @@ export class CommentRepository {
       option,
     );
     if (!updatedComment) {
-      return;
+      return null;
     }
-
     return 'Ok';
   }
 
-  async deletedById(id: string): Promise<string | undefined> {
+  async deletedById(id: string): Promise<string | null> {
     const comment = await Comments.findOne({ _id: id });
     if (!comment) {
-      return;
+      return null;
     }
     const filt = { _id: id };
     const option = { returnOriginal: false }; // false-> 바로 출력
@@ -82,11 +93,9 @@ export class CommentRepository {
       },
       option,
     );
-
     if (!deletedAndupdate) {
-      return;
+      return null;
     }
-
     return 'Ok';
   }
 }

@@ -9,6 +9,7 @@ import { UserService } from '../../../user/application/user.service';
 
 @injectable()
 export class BoardController {
+  // 게시판 생성
   async createdBoard(
     req: express.Request,
     res: express.Response,
@@ -16,8 +17,10 @@ export class BoardController {
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
     const userService = container.get<UserService>(Types.USER_SERVICE);
+
     const registerBoardRequest = RegisterBoardRequest.of(req);
     const { sub } = res.locals.tokenPayload;
+
     const user = await userService.getProfileByUserId(sub);
     const nickname = user ? user.nickname : 'fakeNickname';
     const result = await boardService.createBoard(
@@ -29,6 +32,7 @@ export class BoardController {
     next();
   }
 
+  // 게시판 전체 조회
   async getAllBoards(
     req: express.Request,
     res: express.Response,
@@ -44,23 +48,27 @@ export class BoardController {
     next();
   }
 
+  // 게시판 상세 조회
   async getBoard(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
-    const userService = container.get<UserService>(Types.USER_SERVICE);
+//    const userService = container.get<UserService>(Types.USER_SERVICE);
+
     const id: string = req.params.id;
-    const { sub } = res.locals.tokenPayload;
-    const user = await userService.getProfileByUserId(sub);
-    const nickname = user ? user.nickname : 'fakeNickname';
-    const result = await boardService.getBoardData(nickname, id);
+    //const { sub } = res.locals.tokenPayload;
+
+    //const user = await userService.getProfileByUserId(sub);
+    //const nickname = user ? user.nickname : 'fakeNickname';
+    const result = await boardService.getBoardData(id);
 
     res.locals.data = result;
     next();
   }
 
+  // 게시판 수정
   async updateBoard(
     req: express.Request,
     res: express.Response,
@@ -68,11 +76,13 @@ export class BoardController {
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
     const userService = container.get<UserService>(Types.USER_SERVICE);
+
+    const updateBoardRequest = UpdateBoardRequest.of(req);
     const id: string = req.params.id;
     const { sub } = res.locals.tokenPayload;
+
     const user = await userService.getProfileByUserId(sub);
     const nickname = user ? user.nickname : 'fakeNickname';
-    const updateBoardRequest = UpdateBoardRequest.of(req);
     const result = await boardService.updateBoard(
       nickname,
       id,
@@ -83,6 +93,7 @@ export class BoardController {
     next();
   }
 
+  // 게시판 삭제
   async deleteBoard(
     req: express.Request,
     res: express.Response,
@@ -90,8 +101,10 @@ export class BoardController {
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
     const userService = container.get<UserService>(Types.USER_SERVICE);
+
     const id: string = req.params.id;
     const { sub } = res.locals.tokenPayload;
+
     const user = await userService.getProfileByUserId(sub);
     const nickname = user ? user.nickname : 'fakeNickname';
     const result = await boardService.deleteBoard(nickname, id);
@@ -100,6 +113,7 @@ export class BoardController {
     next();
   }
 
+  // 게시판-참여 신청
   async joinBoard(
     req: express.Request,
     res: express.Response,
@@ -107,8 +121,10 @@ export class BoardController {
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
     const userService = container.get<UserService>(Types.USER_SERVICE);
+
     const id: string = req.params.id;
     const { sub } = res.locals.tokenPayload;
+
     const user = await userService.getProfileByUserId(sub);
     const nickname = user ? user.nickname : 'fakeNickname';
     const result = await boardService.joinBoard(nickname, id);

@@ -1,3 +1,4 @@
+import { UserUpdateRequest } from './dto/request/user.update.request';
 import { UserProfileResponse } from './dto/response/user.profile.response';
 import { RedisCache } from './../../misc/utils/redis.util';
 import { JwtLoginPayload } from './../common/auth.utils';
@@ -22,6 +23,7 @@ import {
 } from '../common/auth.utils';
 import { UserRefreshResponse } from './dto/response/user.refresh.response';
 import { UserRefreshRequest } from './dto/request/user.refresh.request';
+import { toUpdateEntity } from '../../misc/utils/request.util';
 
 @injectable()
 export class UserService {
@@ -70,6 +72,31 @@ export class UserService {
   // 유저 로그아웃
   async logout(userId: number): Promise<string | null> {
     return await this.deleteRefreshToken(userId);
+  }
+
+  // 유저 정보 변경
+  async updateUserInfo(
+    sub: number,
+    userId: number,
+    updateRequest: UserUpdateRequest,
+  ): Promise<string> {
+    // 토큰의 userId와 userId가 일치하지 않으면 에러 처리
+    if (sub !== userId) {
+      throw new AppError(commonErrors.INPUT_ERROR, 400, '유저 정보가 일치하지 않습니다');
+    }
+
+    const targetUser = await this.userRepository.findById(userId);
+
+    if (!targetUser) {
+      throw new AppError(commonErrors.RESOURCE_NOT_FOUND_ERROR, 400, '해당 유저가 존재하지 않습니다');
+    }
+
+    await updateRequest.encryptPassword();
+    const newUser = toUpdateEntity(targetUser, updateRequest);
+
+    await this.userRepository.save(newUser);
+
+    return 'OK';
   }
 
   // 리프레시 토큰이 올바른지 검증하고 액세스 토큰을 새로 반환해주는 메소드
@@ -124,7 +151,11 @@ export class UserService {
   async deleteUser(userId: number, sub: number): Promise<string | null> {
     // 만일 토큰에 있는 userId와 param으로 부터 받아온 userId가 일치하지 않으면 예외 처리
     if (userId !== sub) {
-      throw new AppError(commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
+      throw new AppError(
+        commonErrors.INPUT_ERROR,
+        400,
+        '잘못된 유저 정보입니다.',
+      );
     }
 
     const deletedUser = await this.userRepository.deleteById(userId);
@@ -161,11 +192,19 @@ export class UserService {
 
   // 토큰을 생성하는 메소드
   private generateAccessToken(payload: JwtLoginPayload): string {
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!);
+    const accessTokenExpIn = `${process.env.ACCESS_TOKEN_EXP_HOUR}h`;
+
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, {
+      expiresIn: accessTokenExpIn,
+    });
   }
 
   private generateRefreshToken(payload: JwtLoginPayload): string {
-    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!);
+    const refreshTokenExpIn = `${process.env.REFRESH_TOKEN_EXP_DAY}d`;
+
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
+      expiresIn: refreshTokenExpIn,
+    });
   }
 
   // Redis에 refreshToken을 보관하는 메소드

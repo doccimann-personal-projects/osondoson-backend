@@ -7,10 +7,10 @@ export class Letter extends TimestampsEntity {
     id : number;
 
     @Column()
-    authorId : string;
+    authorId : number;
 
     @Column()
-    receiverId : string;
+    receiverId : number;
 
     @Column()
     content : string;
@@ -22,8 +22,8 @@ export class Letter extends TimestampsEntity {
     isDeletedByReceiver : boolean;
 
     constructor(
-        authorId : string,
-        receiverId : string,
+        authorId : number,
+        receiverId : number,
         content : string,
         isDeletedByAuthor : boolean,
         isDeletedByReceiver : boolean,

@@ -1,8 +1,10 @@
-export class LetterResponse {
-    receiverId : string;
-    content  : string;
 
-    constructor(receiverId : string, content : string) {
+export class LetterResponse {
+    receiverId : number;
+
+    content : string;
+
+    constructor( receiverId : number, content : string) {
         this.receiverId = receiverId;
         this.content = content;
     }

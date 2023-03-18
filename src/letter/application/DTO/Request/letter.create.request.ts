@@ -8,7 +8,7 @@ export class CreateRequest {
     
     @IsString()
     @IsNotEmpty()
-    receiverId : string;
+    receiverId : number;
 
     @IsString()
     @IsNotEmpty()

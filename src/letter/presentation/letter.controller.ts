@@ -19,4 +19,30 @@ export class LetterController {
             next(error);
         }
     }
+
+    async deleteLetter(req : Request, res : Response, next : NextFunction) {
+        try {
+            const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+
+            const { id } = req.params;
+            const { sub } = res.locals.tokenPayload;
+
+            const deleteResponse = await letterService.deleteLetter(Number(id));
+            res.locals.data = deleteResponse;
+            next();
+        }catch(error) {
+            next(error)
+        }
+    }
+    async getLetter(req : Request, res : Response, next : NextFunction) {
+        try{
+            const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+            const { sub } = res.locals.tokenPayload;
+            const messageResponse = await letterService.getReceiverId(sub);
+            res.locals.data = messageResponse;
+            next();
+        }catch(error){
+            next(error)
+        }
+    }
 }

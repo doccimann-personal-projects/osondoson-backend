@@ -10,4 +10,8 @@ export const Types = {
   COMMENT_REPOSITORY: 'CommentRepository',
   COMMENT_SERVICE: 'CommentService',
   COMMENT_CONTROLLER: 'CommentController',
+
+  LETTER_REPOSITORY : 'LetterRepositoty',
+  LETTER_CONTROLLER : 'LetterController',
+  LETTER_SERVICE : 'LetterService',
 };

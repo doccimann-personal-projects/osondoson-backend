@@ -10,6 +10,7 @@ import { Types } from '../../../app/container/types.di';
 import { UserService } from '../../../user/application/user.service';
 
 const boardService: BoardService = container.get(Types.BOARD_SERVICE);
+const userService: UserService=container.get(Types.USER_SERVICE);
 
 export const checkCreatable =
   () =>
@@ -80,6 +81,30 @@ export const checkIdExist =
           commonErrors.INPUT_ERROR,
           204,
           `해당 id의 게시글은 존재하지 않습니다.`,
+        ),
+      );
+    }
+    next();
+  };
+
+  export const CheckIsYours=()=>async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    const { sub } = res.locals.tokenPayload;
+
+    const user = await userService.getProfileByUserId(sub);
+    const nickname = user ? user.nickname : 'fakeNickname';
+
+    // 해당 id의 게시글 존재 여부
+    const isYours: boolean = await boardService.isYours(nickname);
+    if (isYours) {
+      return next(
+        new AppError(
+          commonErrors.INPUT_ERROR,
+          204,
+          `접근 권한이 없습니다.`,
         ),
       );
     }

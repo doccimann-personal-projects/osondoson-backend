@@ -48,8 +48,8 @@ export class BoardService {
   }
 
   // 게시판 상세 조회
-  async getBoardData(nickname: string, id: string): Promise<object | null> {
-    const board = await this.boardRepository.findBoardById(nickname, id);
+  async getBoardData(id: string): Promise<object | null> {
+    const board = await this.boardRepository.findBoardById(id);
 
     return board;
   }
@@ -63,6 +63,12 @@ export class BoardService {
   // title, content 하나라도 존재하는지 확인
   async isExistedOne(title?: string, content?: string): Promise<boolean> {
     return !title && !content ? true : false;
+  }
+
+  // 접근 권한 확인(본인 글인지 확인)
+  async isYours(nickname:string):Promise<boolean>{
+    const isyours=await this.boardRepository.findBoardByNickname(nickname);
+    return isyours ? false:true;
   }
 
   // 게시판 수정

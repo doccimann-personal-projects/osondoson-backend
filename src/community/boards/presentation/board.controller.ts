@@ -55,14 +55,14 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
-    const userService = container.get<UserService>(Types.USER_SERVICE);
+//    const userService = container.get<UserService>(Types.USER_SERVICE);
 
     const id: string = req.params.id;
-    const { sub } = res.locals.tokenPayload;
+    //const { sub } = res.locals.tokenPayload;
 
-    const user = await userService.getProfileByUserId(sub);
-    const nickname = user ? user.nickname : 'fakeNickname';
-    const result = await boardService.getBoardData(nickname, id);
+    //const user = await userService.getProfileByUserId(sub);
+    //const nickname = user ? user.nickname : 'fakeNickname';
+    const result = await boardService.getBoardData(id);
 
     res.locals.data = result;
     next();

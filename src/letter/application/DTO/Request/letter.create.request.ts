@@ -1,41 +1,30 @@
+import { Letter } from './../../../domain/letter.entity';
 import { Request } from 'express';
-import { Letter } from '../../../domain/letter.entity';
-import { IsString, IsNotEmpty, MaxLength,MinLength, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 
-export class CreateRequest {
-    // @IsString()
-    // authorId : string;
-    
-    @IsString()
-    @IsNotEmpty()
-    receiverId : number;
+export class LetterCreateRequest {
+  @IsString()
+  @IsNotEmpty()
+  receiverId: number;
 
-    @IsString()
-    @IsNotEmpty()
-    @MinLength(1)
-    @MaxLength(200)
-    content : string;
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(1)
+  @MaxLength(200)
+  content: string;
 
-    // @IsBoolean()
-    // isDeleteByAuthor : boolean;
+  static of(req: Request): LetterCreateRequest {
+    const { receiverId, content } = req.body;
 
-    // @IsBoolean()
-    // isDeleteByReceiver : boolean;
-    
-    static of(req : Request) : CreateRequest {
-        const { receiverId, content } = req.body;
+    const createRequest = new LetterCreateRequest();
+    createRequest.receiverId = receiverId;
+    createRequest.content = content;
 
-        const createRequest = new CreateRequest();
-        createRequest.receiverId = receiverId;
-        createRequest.content = content;
-        // createRequest.authorId = 'user';
-        // createRequest.isDeleteByAuthor = false;
-        // createRequest.isDeleteByReceiver = false;
-        return createRequest;
-    }
+    return createRequest;
+  }
 
-    // toLetterEntity() {
-    //     const { authorId,receiverId, content, isDeleteByAuthor, isDeleteByReceiver } = this;
-    //     return new Letter ( authorId, receiverId, content, isDeleteByAuthor, isDeleteByReceiver)
-    // }
+  toEntity(authorId: number): Letter {
+    const { receiverId, content } = this;
+    return new Letter(authorId, receiverId, content, false, false);
+  }
 }

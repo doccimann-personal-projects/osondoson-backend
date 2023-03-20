@@ -59,9 +59,7 @@ export class BoardRepository {
     return result;
   }
 
-  async findBoardById(
-    id: string,
-  ): Promise<BoardsTypes | null> {
+  async findBoardById(id: string): Promise<BoardsTypes | null> {
     const board = await Boards.findOne({ _id: id });
     if (!board) {
       return null;
@@ -71,14 +69,16 @@ export class BoardRepository {
       title: board.title,
       content: board.content,
       participantInfo: board.participantInfo,
+      authorId: board.authorId,
+      createdAt: board.createdAt,
     };
 
     return result;
   }
 
-  async findBoardByNickname(nickname:string):Promise<BoardsTypes | null>{
-    const Isyours=await Boards.findOne({authorId:nickname});
-    if(!Isyours){
+  async findBoardByNickname(nickname: string): Promise<BoardsTypes | null> {
+    const Isyours = await Boards.findOne({ authorId: nickname });
+    if (!Isyours) {
       return null;
     }
     const result: BoardsTypes = {
@@ -87,7 +87,7 @@ export class BoardRepository {
       content: Isyours.content,
       participantInfo: Isyours.participantInfo,
     };
-    return result
+    return result;
   }
 
   async updateById(

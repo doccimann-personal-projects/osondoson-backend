@@ -23,29 +23,48 @@ export class LetterController {
     }
   }
 
-  async deleteLetter(req: Request, res: Response, next: NextFunction) {
+  // async deleteLetter(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+
+  //     const { id } = req.params;
+  //     const { sub } = res.locals.tokenPayload;
+
+  //     const deleteResponse = await letterService.deleteLetter(Number(id));
+  //     res.locals.data = deleteResponse;
+  //     next();
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  async getReceiveLetter(req: Request, res: Response, next: NextFunction) {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
-
-      const { id } = req.params;
+      
+      const {receiverId} = req.params;
+      
       const { sub } = res.locals.tokenPayload;
-
-      const deleteResponse = await letterService.deleteLetter(Number(id));
-      res.locals.data = deleteResponse;
-      next();
-    } catch (error) {
-      next(error);
-    }
-  }
-  async getLetter(req: Request, res: Response, next: NextFunction) {
-    try {
-      const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
-      const { sub } = res.locals.tokenPayload;
-      const messageResponse = await letterService.getReceiverId(sub);
+      
+      const messageResponse = await letterService.getReceiverMsg(Number(receiverId),sub);
       res.locals.data = messageResponse;
       next();
     } catch (error) {
       next(error);
     }
+  }
+
+  async getAuthorLetter(req : Request, res : Response, next : NextFunction) {
+    try{
+    const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+
+    const { authorId }  = req.params;
+    const {sub} = res.locals.tokenPayload;
+
+    const messageResponse = await letterService.getAuthorMsg(Number(authorId), sub);
+    res.locals.data = messageResponse;
+    next();
+    } catch (error) {
+      next(error);
+    } 
   }
 }

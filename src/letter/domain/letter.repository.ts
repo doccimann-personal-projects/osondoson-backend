@@ -9,18 +9,45 @@ export class LetterRepository {
     return await letter.save();
   }
 
-  async findById(id: number): Promise<Letter | null> {
+  //해당 메세지 찾기
+  async findByMsg ( id : number) : Promise <Letter | null> {
     const connection = await getConnection();
-    return await connection.getRepository(Letter).findOneBy({ id: id });
+
+    return await connection.getRepository(Letter).findOneBy({ id : id });
+
   }
 
-  async deleteById(id: number): Promise<Letter | null> {
-    const targetLetter = await this.findById(id);
+  //받는이 ID 조회
+  async findByReceiverId(id: number): Promise<Letter | null> {
+    const connection = await getConnection();
+    return await connection.getRepository(Letter).findOneBy({ receiverId: id });
+  }
+
+  //보낸이 ID 조회
+  async findByAuthorId ( id : number) : Promise < Letter | null > {
+    const connection = await getConnection();
+    return await connection.getRepository(Letter).findOneBy({ authorId : id });
+  }
+
+  // 보낸 ID 조회 후 삭제
+  async deleteAuById(id: number): Promise<Letter | null> {
+    const targetLetter = await this.findByMsg(id);
 
     if (!targetLetter) return null;
 
     targetLetter.deletedAt = new Date();
-    targetLetter.isDeleted = true;
+    targetLetter.isDeletedByAuthor = true;
+
+    return await targetLetter.save();
+  }
+
+  async deleteReById (id : number) : Promise < Letter | null> {
+    const targetLetter = await this.findByMsg(id);
+
+    if(!targetLetter) return null;
+
+    targetLetter.deletedAt = new Date();
+    targetLetter.isDeletedByReceiver = true;
 
     return await targetLetter.save();
   }

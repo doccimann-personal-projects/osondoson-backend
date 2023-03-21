@@ -20,17 +20,18 @@ letterRouter.post(
   responseMiddleware,
 );
 
-letterRouter.delete(
-  '/:id/inbox',
+//보낸 메세지 조회
+letterRouter.get(
+  '/:authorId/outbox',
   verifyAccessToken,
-  letterController.deleteLetter,
+  letterController.getAuthorLetter,
   responseMiddleware,
-);
-
+)
+//받은 메세지 조회
 letterRouter.get(
   '/:receiverId/inbox',
   verifyAccessToken,
-  letterController.getLetter,
+  letterController.getReceiveLetter,
   responseMiddleware,
 );
 

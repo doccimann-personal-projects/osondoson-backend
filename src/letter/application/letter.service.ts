@@ -1,3 +1,4 @@
+import { ReceivedLetterResponse } from './dto/response/letter.receipt.response';
 import { inject, injectable } from 'inversify';
 import { Letter } from '../domain/letter.entity';
 import { LetterCreateRequest } from './dto/request/letter.create.request';
@@ -6,7 +7,7 @@ import { AppError } from '../../misc/error/error.app';
 import { commonErrors } from '../../misc/error/error.common';
 import { LetterRepository } from '../domain/letter.repository';
 import { LetterCreateResponse } from './dto/response/letter.create.response';
-import { LetterGetResponse } from './dto/response/letter.get.response';
+
 @injectable()
 export class LetterService {
   constructor(
@@ -16,7 +17,7 @@ export class LetterService {
 
   async create(
     createRequest: LetterCreateRequest,
-    authorId: number, 
+    authorId: number,
   ): Promise<LetterCreateResponse> {
     const newLetter: Letter = createRequest.toEntity(authorId);
 
@@ -34,34 +35,30 @@ export class LetterService {
     return 'OK';
   }
 
-  //보낸 쪽지 조회하는 메소드
-  async getAuthorMsg(userId: number, sub : number): Promise<LetterGetResponse | null> {
-    if(userId !== sub) {
-      throw new AppError (commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
-    }
-    
-    const foundAuthor = await this.letterRepository.findByAuthorId(userId);
-
-    const foundAuthorResponse = 
-      foundAuthor && foundAuthor.isDeletedByAuthor ===false
-        ? LetterGetResponse.fromEntity(foundAuthor)
-        : null;
-    return foundAuthorResponse;
-  }
-
-  //받은 쪽지 조회하는 메소드
-  async getReceiverMsg(userId :  number, sub : number) : Promise<LetterGetResponse | null> {
-    // 토큰에 있는 userId 와 param으로 부터 받아온 userId가 일치하지 않으면 예외 처리
-    if( userId !== sub ) {
-      throw new AppError (commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
+  //받은 쪽지의 목록을 반환하는 메소드
+  async getReceivedLetterList(
+    receiverId: number,
+    sub: number,
+    page: number,
+    limit: number,
+  ): Promise<[ReceivedLetterResponse[], number]> {
+    // 토큰에 있는 userId 와 param으로 부터 받아온 receiverId가 일치하지 않으면 예외 처리
+    if (receiverId !== sub) {
+      throw new AppError(
+        commonErrors.INPUT_ERROR,
+        400,
+        '잘못된 유저 정보입니다.',
+      );
     }
 
-    const foundReceiveer = await this.letterRepository.findByReceiverId(userId);
+    const [letterList, letterCount] =
+      await this.letterRepository.findReceivedLetters(receiverId, page, limit);
 
-    const foundReceiverResponse = 
-      foundReceiveer && foundReceiveer.isDeletedByReceiver === false
-      ? LetterGetResponse.fromEntity(foundReceiveer)
-      : null;
-    return foundReceiverResponse;
+    const letterResponseList = letterList?.map(
+      ({ id, authorId, receiverId, content }) =>
+        new ReceivedLetterResponse(id, authorId, receiverId, content),
+    );
+
+    return [letterResponseList, letterCount];
   }
 }

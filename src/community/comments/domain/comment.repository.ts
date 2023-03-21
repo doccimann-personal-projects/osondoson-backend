@@ -27,11 +27,14 @@ export class CommentRepository {
     page: number,
     limit: number,
   ): Promise<object> {
+    const totalPage = await Comments.countDocuments({ isDeleted: false });
     const comments = await Comments.find({ boardId: Id, isDeleted: false })
       .skip(limit * (page - 1))
       .limit(limit)
       .sort({ createdAt: 1 });
-    return comments;
+
+    const result = { totalPage: totalPage, comments: comments };
+    return result;
   }
 
   async findCommentById(id: string): Promise<object | null> {

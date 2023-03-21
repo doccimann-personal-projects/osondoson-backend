@@ -30,11 +30,15 @@ export class BoardRepository {
   }
 
   async findAllBoards(page: number, limit: number): Promise<object> {
+    const totalPage = await Boards.countDocuments({ isDeleted: false });
     const boards = await Boards.find({ isDeleted: false })
       .skip(limit * (page - 1))
       .limit(limit)
       .sort({ createdAt: -1 });
-    return boards;
+
+    const result = { totalPage: totalPage, boards: boards };
+
+    return result;
   }
 
   async findBoardBool(id: string): Promise<BoardsTypes | undefined> {

@@ -1,6 +1,5 @@
 import { injectable } from 'inversify';
 import { getConnection, Repository } from 'typeorm';
-import { LetterCreateRequest } from '../application/dto/request/letter.create.request';
 import { Letter } from './letter.entity';
 
 @injectable()
@@ -36,10 +35,24 @@ export class LetterRepository {
       .getManyAndCount();
   }
 
-  //보낸이 ID 조회
-  async findByAuthorId(id: number): Promise<Letter | null> {
-    const connection = await getConnection();
-    return await connection.getRepository(Letter).findOneBy({ authorId: id });
+  // 보낸 편지들을 페이지네이션 기반으로 받아오는 메소드
+  async findSentLetters(
+    authorId: number,
+    page: number,
+    limit: number,
+  ): Promise<[Letter[], number]> {
+    const letterRepository = await this.getLetterRepository();
+
+    return await letterRepository
+      .createQueryBuilder('letter')
+      .where('letter.authorId = :authorId', { authorId: authorId })
+      .andWhere('letter.isDeletedByAuthor = :isDeletedByAuthor', {
+        isDeletedByAuthor: false,
+      })
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('letter.createdAt', 'DESC')
+      .getManyAndCount();
   }
 
   // 보낸 ID 조회 후 삭제

@@ -1,3 +1,5 @@
+import { NextFunction, Request, Response } from "express";
+
 // 수정된 entity를 반환해주는 함수
 export function toUpdateEntity<T>(entity: T, updateRequest: Partial<T>): T {
   const reducedEntity = Object.entries(updateRequest).reduce(

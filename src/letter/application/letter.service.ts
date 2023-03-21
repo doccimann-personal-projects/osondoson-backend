@@ -1,4 +1,4 @@
-import { ReceivedLetterResponse } from './dto/response/letter.receipt.response';
+import { GetLetterResponse } from './dto/response/letter.view.response';
 import { inject, injectable } from 'inversify';
 import { Letter } from '../domain/letter.entity';
 import { LetterCreateRequest } from './dto/request/letter.create.request';
@@ -41,8 +41,7 @@ export class LetterService {
     sub: number,
     page: number,
     limit: number,
-  ): Promise<[ReceivedLetterResponse[], number]> {
-    // 토큰에 있는 userId 와 param으로 부터 받아온 receiverId가 일치하지 않으면 예외 처리
+  ): Promise<[GetLetterResponse[], number]> {
     if (receiverId !== sub) {
       throw new AppError(
         commonErrors.INPUT_ERROR,
@@ -56,7 +55,32 @@ export class LetterService {
 
     const letterResponseList = letterList?.map(
       ({ id, authorId, receiverId, content }) =>
-        new ReceivedLetterResponse(id, authorId, receiverId, content),
+        new GetLetterResponse(id, authorId, receiverId, content),
+    );
+
+    return [letterResponseList, letterCount];
+  }
+
+  // 보낸 쪽지의 목록을 반환하는 메소드
+  async getSentLetterList(
+    authorId: number,
+    sub: number,
+    page: number,
+    limit: number,
+  ): Promise<[GetLetterResponse[], number]> {
+    if (authorId !== sub) {
+      throw new AppError(
+        commonErrors.INPUT_ERROR,
+        400,
+        '잘못된 유저 정보입니다.',
+      );
+    }
+
+    const [letterList, letterCount] = await this.letterRepository.findSentLetters(authorId, page, limit);
+
+    const letterResponseList = letterList?.map(
+      ({ id, authorId, receiverId, content }) =>
+        new GetLetterResponse(id, authorId, receiverId, content),
     );
 
     return [letterResponseList, letterCount];

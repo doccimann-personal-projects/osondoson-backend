@@ -1,6 +1,9 @@
 import { checkLetterCreatable } from './../presentation/letter.middleware';
 import { Router } from 'express';
-import { paginatedResponseMiddleware, responseMiddleware } from '../../misc/utils/response.util';
+import {
+  paginatedResponseMiddleware,
+  responseMiddleware,
+} from '../../misc/utils/response.util';
 import { validateBody } from '../../misc/utils/validate.util';
 import container from '../../app/container/container';
 import { LetterCreateRequest } from '../application/dto/request/letter.create.request';
@@ -28,7 +31,15 @@ letterRouter.get(
   '/inbox',
   verifyAccessToken,
   letterController.getReceivedLetterList,
-  paginatedResponseMiddleware
+  paginatedResponseMiddleware,
+);
+
+// 보낸 편지 목록을 페이지네이션 기반으로 조회
+letterRouter.get(
+  '/outbox',
+  verifyAccessToken,
+  letterController.getSentLetterList,
+  paginatedResponseMiddleware,
 );
 
 export default letterRouter;

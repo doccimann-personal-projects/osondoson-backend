@@ -51,7 +51,12 @@ export function paginatedResponseMiddleware(
   const { page, limit } = req.query;
   const { dataList, totalElements } = res.locals;
 
-  const responseBody = buildPaginatedResponse(totalElements, Number(page), Number(limit), dataList);
+  const responseBody = buildPaginatedResponse(
+    totalElements,
+    Number(page),
+    Number(limit),
+    dataList,
+  );
 
   const logMessage = getSuccessLogMessage(req, res, dataList);
 
@@ -61,6 +66,16 @@ export function paginatedResponseMiddleware(
   dataList.length === 0
     ? res.status(204).json(responseBody)
     : res.json(responseBody);
+}
+
+// 페이지네이션 결과를 res에 바인딩하는 함수
+export function bindPaginatedResponse(
+  res: Response,
+  responseList: any[],
+  totalElements: number,
+) {
+  res.locals.dataList = responseList;
+  res.locals.totalElements = totalElements;
 }
 
 // 로깅 메시지를 반환하는 함수

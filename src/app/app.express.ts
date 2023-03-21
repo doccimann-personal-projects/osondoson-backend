@@ -28,12 +28,12 @@ export class ExpressApp {
         data: 'OK',
       });
     });
-
+    //communityRouter
     /* 사용자 정의 Router를 위치시키는 자리 */
     expressApp.use('/api/users', userRouter);
     expressApp.use('/api/boards', boardRouter);
+    expressApp.use('/api', commentRouter);
     expressApp.use('/api/letters', letterRouter);
-    //expressApp.use('/api', commentRouter);
 
     // 허용되지 않은 요청을 처리하는 라우터
     expressApp.use(

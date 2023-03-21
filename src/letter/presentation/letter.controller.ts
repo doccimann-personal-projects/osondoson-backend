@@ -7,13 +7,14 @@ import { LetterService } from '../application/letter.service';
 
 @injectable()
 export class LetterController {
-  async makeLetter(req: Request, res: Response, next: NextFunction) {
+  async createLetter(req: Request, res: Response, next: NextFunction) {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
 
       const { sub } = res.locals.tokenPayload;
+      const { receiverId, content } = req.body;
 
-      const createRequest = LetterCreateRequest.of(req);
+      const createRequest = new LetterCreateRequest(Number(receiverId), content);
       const result = await letterService.create(createRequest, sub);
 
       res.locals.data = result;
@@ -23,25 +24,50 @@ export class LetterController {
     }
   }
 
-  async deleteLetter(req: Request, res: Response, next: NextFunction) {
+  // async deleteLetter(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+
+  //     const { id } = req.params;
+  //     const { sub } = res.locals.tokenPayload;
+
+  //     const deleteResponse = await letterService.deleteLetter(Number(id));
+  //     res.locals.data = deleteResponse;
+  //     next();
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  async getReceiveLetter(req: Request, res: Response, next: NextFunction) {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
 
-      const { id } = req.params;
+      const { receiverId } = req.params;
+
       const { sub } = res.locals.tokenPayload;
 
-      const deleteResponse = await letterService.deleteLetter(Number(id));
-      res.locals.data = deleteResponse;
+      const messageResponse = await letterService.getReceiverMsg(
+        Number(receiverId),
+        sub,
+      );
+      res.locals.data = messageResponse;
       next();
     } catch (error) {
       next(error);
     }
   }
-  async getLetter(req: Request, res: Response, next: NextFunction) {
+
+  async getAuthorLetter(req: Request, res: Response, next: NextFunction) {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+
+      const { authorId } = req.params;
       const { sub } = res.locals.tokenPayload;
-      const messageResponse = await letterService.getReceiverId(sub);
+
+      const messageResponse = await letterService.getAuthorMsg(
+        Number(authorId),
+        sub,
+      );
       res.locals.data = messageResponse;
       next();
     } catch (error) {

@@ -5,7 +5,7 @@ import { AppError } from '../error/error.app';
 import { NextFunction, Request, Response } from 'express';
 
 // class-validator에 의해 dto를 검증하는 함수
-export function validateBody(schema: { new (): any }) {
+export function validateBody(schema: { new (...args: any[]): any }) {
   return async function (req: Request, res: Response, next: NextFunction) {
     const target = plainToInstance(schema, req.body);
     try {

@@ -1,3 +1,4 @@
+import { Letter } from './../letter/domain/letter.entity';
 import 'dotenv/config';
 import { createConnection, DataSourceOptions, getConnection } from 'typeorm';
 import { logger } from '../misc/logger';
@@ -37,7 +38,7 @@ export async function connectPostgresql(): Promise<void> {
       username: process.env.POSTGRES_USERNAME,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DATABASE,
-      entities: [User],
+      entities: [User, Letter],
       synchronize: true,
       logging: true,
       logger: 'advanced-console',

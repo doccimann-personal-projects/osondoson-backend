@@ -24,30 +24,44 @@ export class LetterService {
 
     return LetterCreateResponse.fromEntity(savedLetter);
   }
-  // 쪽지 글자 수 200자 초과여부
-  async isMaxContent(content: string): Promise<boolean> {
-    if (content.length > 200) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  async deleteLetter(id: number): Promise<string | null> {
-    const deleteLetter = await this.letterRepository.deleteById(id);
-    //삭제 실패시 false 반환
+
+  async deleteAuLetter(id: number): Promise<string | null> {
+    const deleteLetter = await this.letterRepository.deleteAuById(id);
+    //삭제 실패시 null 반환
     if (!deleteLetter) {
       return null;
     }
     return 'OK';
   }
 
-  async getReceiverId(receiverId: number): Promise<LetterGetResponse | null> {
-    const foundReceiver = await this.letterRepository.findById(receiverId);
+  //보낸 쪽지 조회하는 메소드
+  async getAuthorMsg(userId: number, sub : number): Promise<LetterGetResponse | null> {
+    if(userId !== sub) {
+      throw new AppError (commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
+    }
+    
+    const foundAuthor = await this.letterRepository.findByAuthorId(userId);
 
-    const letterReceiverResponse =
-      foundReceiver && foundReceiver.isDeletedByReceiver === false
-        ? LetterGetResponse.fromEntity(foundReceiver)
+    const foundAuthorResponse = 
+      foundAuthor && foundAuthor.isDeletedByAuthor ===false
+        ? LetterGetResponse.fromEntity(foundAuthor)
         : null;
-    return letterReceiverResponse;
+    return foundAuthorResponse;
+  }
+
+  //받은 쪽지 조회하는 메소드
+  async getReceiverMsg(userId :  number, sub : number) : Promise<LetterGetResponse | null> {
+    // 토큰에 있는 userId 와 param으로 부터 받아온 userId가 일치하지 않으면 예외 처리
+    if( userId !== sub ) {
+      throw new AppError (commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
+    }
+
+    const foundReceiveer = await this.letterRepository.findByReceiverId(userId);
+
+    const foundReceiverResponse = 
+      foundReceiveer && foundReceiveer.isDeletedByReceiver === false
+      ? LetterGetResponse.fromEntity(foundReceiveer)
+      : null;
+    return foundReceiverResponse;
   }
 }

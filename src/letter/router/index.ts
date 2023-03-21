@@ -1,4 +1,7 @@
-import { checkLetterCreatable } from './../presentation/letter.middleware';
+import {
+  checkLetterCreatable,
+  checkIsValidUser,
+} from './../presentation/letter.middleware';
 import { Router } from 'express';
 import {
   paginatedResponseMiddleware,
@@ -11,7 +14,7 @@ import { LetterController } from '../presentation/letter.controller';
 import { Types } from '../../app/container/types.di';
 import { verifyAccessToken } from '../../user/presentation/user.middleware';
 
-const letterRouter: Router = Router();
+const letterRouter: Router = Router({ mergeParams: true });
 const letterController: LetterController = container.get<LetterController>(
   Types.LETTER_CONTROLLER,
 );
@@ -20,6 +23,7 @@ const letterController: LetterController = container.get<LetterController>(
 letterRouter.post(
   '/',
   verifyAccessToken,
+  checkIsValidUser,
   validateBody(LetterCreateRequest),
   checkLetterCreatable,
   letterController.createLetter,
@@ -30,6 +34,7 @@ letterRouter.post(
 letterRouter.get(
   '/inbox',
   verifyAccessToken,
+  checkIsValidUser,
   letterController.getReceivedLetterList,
   paginatedResponseMiddleware,
 );
@@ -38,8 +43,18 @@ letterRouter.get(
 letterRouter.get(
   '/outbox',
   verifyAccessToken,
+  checkIsValidUser,
   letterController.getSentLetterList,
   paginatedResponseMiddleware,
+);
+
+// 수신자에 의해서 편지를 삭제하는 endpoint
+letterRouter.delete(
+  '/:id/inbox',
+  verifyAccessToken,
+  checkIsValidUser,
+  letterController.deleteReceivedLetter,
+  responseMiddleware,
 );
 
 export default letterRouter;

@@ -13,14 +13,14 @@ export class LetterController {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
 
-      const { sub } = res.locals.tokenPayload;
+      const { userId } = req.params;
       const { receiverId, content } = req.body;
 
       const createRequest = new LetterCreateRequest(
         Number(receiverId),
         content,
       );
-      const result = await letterService.create(createRequest, sub);
+      const result = await letterService.create(createRequest, Number(userId));
 
       res.locals.data = result;
       next();
@@ -34,27 +34,24 @@ export class LetterController {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
 
-      const { 'receiver-id': receiverId, page, limit } = req.query;
+      const { page, limit } = req.query;
+      const { userId } = req.params;
 
-      const { sub } = res.locals.tokenPayload;
-
-      const [numericReceiverId, numericPage, numericLimit] = transformToNumber(
-        receiverId,
+      const [numericUserId, numericPage, numericLimit] = transformToNumber(
+        userId,
         page,
         limit,
       );
 
       const [letterResponseList, totalElements] =
         await letterService.getReceivedLetterList(
-          numericReceiverId,
-          sub,
+          numericUserId,
           numericPage,
           numericLimit,
         );
 
-      res.locals.dataList = letterResponseList;
-      res.locals.totalElements = totalElements;
-
+      // 페이징 처리된 결과를 res.locals에 바인딩
+      bindPaginatedResponse(res, letterResponseList, totalElements);
       next();
     } catch (error) {
       next(error);
@@ -66,26 +63,41 @@ export class LetterController {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
 
-      const { 'author-id': authorId, page, limit } = req.query;
-      const { sub } = res.locals.tokenPayload;
+      const { page, limit } = req.query;
+      const { userId } = req.params;
 
       // 모두 숫자 타입으로 변환
-      const [numericAuthorId, numericPage, numericLimit] = transformToNumber(
-        authorId,
+      const [numericUserId, numericPage, numericLimit] = transformToNumber(
+        userId,
         page,
         limit,
       );
 
       const [letterResponseList, totalElements] =
         await letterService.getSentLetterList(
-          numericAuthorId,
-          sub,
+          numericUserId,
           numericPage,
           numericLimit,
         );
 
       // 페이징 처리된 결과를 res.locals에 바인딩
       bindPaginatedResponse(res, letterResponseList, totalElements);
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // 수신된 편지를 삭제하는 메소드
+  async deleteReceivedLetter(req: Request, res: Response, next: NextFunction) {
+    try {
+      const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+
+      const { id } = req.params;
+
+      const deleteResult = await letterService.deleteReceivedLetter(Number(id));
+
+      res.locals.data = deleteResult;
       next();
     } catch (error) {
       next(error);

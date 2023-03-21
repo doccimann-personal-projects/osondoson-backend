@@ -17,39 +17,21 @@ export class LetterService {
 
   async create(
     createRequest: LetterCreateRequest,
-    authorId: number,
+    userId: number
   ): Promise<LetterCreateResponse> {
-    const newLetter: Letter = createRequest.toEntity(authorId);
+    const newLetter: Letter = createRequest.toEntity(userId);
 
     const savedLetter = await this.letterRepository.create(newLetter);
 
     return LetterCreateResponse.fromEntity(savedLetter);
   }
 
-  async deleteAuLetter(id: number): Promise<string | null> {
-    const deleteLetter = await this.letterRepository.deleteAuById(id);
-    //삭제 실패시 null 반환
-    if (!deleteLetter) {
-      return null;
-    }
-    return 'OK';
-  }
-
   //받은 쪽지의 목록을 반환하는 메소드
   async getReceivedLetterList(
     receiverId: number,
-    sub: number,
     page: number,
     limit: number,
   ): Promise<[GetLetterResponse[], number]> {
-    if (receiverId !== sub) {
-      throw new AppError(
-        commonErrors.INPUT_ERROR,
-        400,
-        '잘못된 유저 정보입니다.',
-      );
-    }
-
     const [letterList, letterCount] =
       await this.letterRepository.findReceivedLetters(receiverId, page, limit);
 
@@ -64,18 +46,9 @@ export class LetterService {
   // 보낸 쪽지의 목록을 반환하는 메소드
   async getSentLetterList(
     authorId: number,
-    sub: number,
     page: number,
     limit: number,
   ): Promise<[GetLetterResponse[], number]> {
-    if (authorId !== sub) {
-      throw new AppError(
-        commonErrors.INPUT_ERROR,
-        400,
-        '잘못된 유저 정보입니다.',
-      );
-    }
-
     const [letterList, letterCount] = await this.letterRepository.findSentLetters(authorId, page, limit);
 
     const letterResponseList = letterList?.map(
@@ -84,5 +57,12 @@ export class LetterService {
     );
 
     return [letterResponseList, letterCount];
+  }
+
+  // 받은 쪽지를 삭제하는 메소드
+  async deleteReceivedLetter(letterId: number): Promise<string | null> {
+    const deletedLetter = await this.letterRepository.deleteReceivedLetter(letterId);
+
+    return deletedLetter ? 'OK' : null;
   }
 }

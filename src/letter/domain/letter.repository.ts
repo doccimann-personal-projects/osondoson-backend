@@ -55,27 +55,19 @@ export class LetterRepository {
       .getManyAndCount();
   }
 
-  // 보낸 ID 조회 후 삭제
-  async deleteAuById(id: number): Promise<Letter | null> {
-    const targetLetter = await this.findByMsg(id);
+  // 수신된 편지를 삭제 처리하는 메소드
+  async deleteReceivedLetter(id: number): Promise<Letter | null> {
+    const letterRepository = await this.getLetterRepository();
 
-    if (!targetLetter) return null;
+    const foundLetter = await letterRepository.findOneBy({ id: id });
 
-    targetLetter.deletedAt = new Date();
-    targetLetter.isDeletedByAuthor = true;
+    // 만약 편지가 존재하지 않으면 null을 바로 반환
+    if (!foundLetter) return null;
 
-    return await targetLetter.save();
-  }
+    // 수신자에 의해 삭제된 편지를 반환해준다
+    const deletedLetter = foundLetter.deleteByReceiver();
 
-  async deleteReById(id: number): Promise<Letter | null> {
-    const targetLetter = await this.findByMsg(id);
-
-    if (!targetLetter) return null;
-
-    targetLetter.deletedAt = new Date();
-    targetLetter.isDeletedByReceiver = true;
-
-    return await targetLetter.save();
+    return await deletedLetter.save();
   }
 
   // connection을 통해서 repository를 가져오는 메소드
@@ -84,4 +76,5 @@ export class LetterRepository {
 
     return connection.getRepository(Letter);
   }
+
 }

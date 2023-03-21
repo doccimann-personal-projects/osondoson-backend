@@ -28,7 +28,7 @@ export class ExpressApp {
         data: 'OK',
       });
     });
-    //communityRouter
+
     /* 사용자 정의 Router를 위치시키는 자리 */
     expressApp.use('/api/users', userRouter);
     expressApp.use('/api/boards', boardRouter);

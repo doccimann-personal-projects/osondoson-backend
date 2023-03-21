@@ -7,13 +7,14 @@ import { LetterService } from '../application/letter.service';
 
 @injectable()
 export class LetterController {
-  async makeLetter(req: Request, res: Response, next: NextFunction) {
+  async createLetter(req: Request, res: Response, next: NextFunction) {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
 
       const { sub } = res.locals.tokenPayload;
+      const { receiverId, content } = req.body;
 
-      const createRequest = LetterCreateRequest.of(req);
+      const createRequest = new LetterCreateRequest(Number(receiverId), content);
       const result = await letterService.create(createRequest, sub);
 
       res.locals.data = result;
@@ -40,12 +41,15 @@ export class LetterController {
   async getReceiveLetter(req: Request, res: Response, next: NextFunction) {
     try {
       const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
-      
-      const {receiverId} = req.params;
-      
+
+      const { receiverId } = req.params;
+
       const { sub } = res.locals.tokenPayload;
-      
-      const messageResponse = await letterService.getReceiverMsg(Number(receiverId),sub);
+
+      const messageResponse = await letterService.getReceiverMsg(
+        Number(receiverId),
+        sub,
+      );
       res.locals.data = messageResponse;
       next();
     } catch (error) {
@@ -53,18 +57,21 @@ export class LetterController {
     }
   }
 
-  async getAuthorLetter(req : Request, res : Response, next : NextFunction) {
-    try{
-    const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+  async getAuthorLetter(req: Request, res: Response, next: NextFunction) {
+    try {
+      const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
 
-    const { authorId }  = req.params;
-    const {sub} = res.locals.tokenPayload;
+      const { authorId } = req.params;
+      const { sub } = res.locals.tokenPayload;
 
-    const messageResponse = await letterService.getAuthorMsg(Number(authorId), sub);
-    res.locals.data = messageResponse;
-    next();
+      const messageResponse = await letterService.getAuthorMsg(
+        Number(authorId),
+        sub,
+      );
+      res.locals.data = messageResponse;
+      next();
     } catch (error) {
       next(error);
-    } 
+    }
   }
 }

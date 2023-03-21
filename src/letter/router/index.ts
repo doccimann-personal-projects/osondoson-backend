@@ -1,3 +1,4 @@
+import { checkLetterCreatable } from './../presentation/letter.middleware';
 import { Router } from 'express';
 import { responseMiddleware } from '../../misc/utils/response.util';
 import { validateBody } from '../../misc/utils/validate.util';
@@ -12,11 +13,13 @@ const letterController: LetterController = container.get<LetterController>(
   Types.LETTER_CONTROLLER,
 );
 
+// 쪽지 생성
 letterRouter.post(
   '/',
   verifyAccessToken,
   validateBody(LetterCreateRequest),
-  letterController.makeLetter,
+  checkLetterCreatable, 
+  letterController.createLetter,
   responseMiddleware,
 );
 
@@ -26,7 +29,7 @@ letterRouter.get(
   verifyAccessToken,
   letterController.getAuthorLetter,
   responseMiddleware,
-)
+);
 //받은 메세지 조회
 letterRouter.get(
   '/:receiverId/inbox',

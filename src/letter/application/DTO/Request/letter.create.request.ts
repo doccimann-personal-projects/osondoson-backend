@@ -1,10 +1,9 @@
-import { Letter } from './../../../domain/letter.entity';
+import { Letter } from '../../../domain/letter.entity';
 import { Request } from 'express';
-import { IsString, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, MinLength, IsNumber } from 'class-validator';
 
 export class LetterCreateRequest {
-  @IsString()
-  @IsNotEmpty()
+  @IsNumber()
   receiverId: number;
 
   @IsString()
@@ -13,14 +12,9 @@ export class LetterCreateRequest {
   @MaxLength(200)
   content: string;
 
-  static of(req: Request): LetterCreateRequest {
-    const { receiverId, content } = req.body;
-
-    const createRequest = new LetterCreateRequest();
-    createRequest.receiverId = receiverId;
-    createRequest.content = content;
-
-    return createRequest;
+  constructor(receiverId: number, content: string) {
+    this.receiverId = receiverId;
+    this.content = content;
   }
 
   toEntity(authorId: number): Letter {

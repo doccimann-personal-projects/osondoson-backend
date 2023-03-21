@@ -6,19 +6,19 @@ export class Letter extends TimestampsEntity {
     @PrimaryGeneratedColumn()
     id : number;
 
-    @Column()
+    @Column({type: 'int'})
     authorId : number;
 
-    @Column()
+    @Column({type: 'int'})
     receiverId : number;
 
-    @Column()
+    @Column({type: 'varchar'})
     content : string;
 
-    @Column()
+    @Column({type: 'boolean', name: 'isDeletedByAuthor'})
     isDeletedByAuthor : boolean;
 
-    @Column()
+    @Column({type: 'boolean', name: 'isDeletedByReceiver'})
     isDeletedByReceiver : boolean;
 
     constructor(

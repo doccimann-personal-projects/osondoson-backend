@@ -54,12 +54,10 @@ pipeline {
         stage('Deploy to VM') {
             steps {
                 script {
-                    def sshCredentials = credentials("${VM_ENTER_CREDENTIAL_ID}")
-
-                    sshagent([sshCredentials]) {
+                    sshagent(credentials: ["${VM_ENTER_CREDENTIAL_ID}"]) {
                         withCredentials([usernamePassword(credentialsId: "${OSONDOSON_VM_CREDENTIAL_ID}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                             sh """
-                                sshpass -p '${PASSWORD}' ssh -o StrictHostKeyChecking=no -i ${sshCredentials} ${USERNAME}@${TARGET_HOST} '
+                                sshpass -p '${PASSWORD}' ssh -o StrictHostKeyChecking=no ${USERNAME}@${TARGET_HOST} '
                                     ls
                                 '
                             """

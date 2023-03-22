@@ -1,5 +1,11 @@
 import { Letter } from '../../../domain/letter.entity';
-import { IsString, IsNotEmpty, MaxLength, MinLength, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  MaxLength,
+  MinLength,
+  IsNumber,
+} from 'class-validator';
 
 export class LetterCreateRequest {
   @IsNumber()

@@ -1,4 +1,4 @@
-import { Letter } from "../../../domain/letter.entity";
+import { Letter } from '../../../domain/letter.entity';
 
 export class LetterCreateResponse {
   id: number;

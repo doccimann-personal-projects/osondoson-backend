@@ -2,23 +2,22 @@ pipeline {
     agent any
 
     environment {
-        // .env 파일의 환경 변수를 빌드 환경으로 설정
-        DOT_DEV = credentials('osondoson-backend-env')
-        ECR_REPO = '014276069644.dkr.ecr.ap-northeast-2.amazonaws.com/osondoson-backend'
+        DOT_DEV = credentials('osondoson-backend-env') // .env 파일의 환경 변수를 빌드 환경으로 설정
 
+        /* Jenkins credentials */
         AWS_CREDENTIAL_ID = 'ecr-user'
+        VM_ENTER_CREDENTIAL_ID = 'enter-vm-credential' // elice VM에 접속하기 위한 credential
+        OSONDOSON_VM_CREDENTIAL_ID = 'osondoson-vm-credential' // VM 자체에 대한 credential (사용자 이름, 패스워드)
 
+        /* AWS Info */
         ACCOUNT_ID = '014276069644'
         REGION = 'ap-northeast-2'
+        ECR_REPO = '014276069644.dkr.ecr.ap-northeast-2.amazonaws.com/osondoson-backend'
 
-        // elice VM에 접속하기 위한 credential
-        VM_ENTER_CREDENTIAL_ID = 'enter-vm-credential'
-        // VM 자체에 대한 credential (사용자 이름, 패스워드)
-        OSONDOSON_VM_CREDENTIAL_ID = 'osondoson-vm-credential'
-        // VM 호스트
+        /* VM Info */
         TARGET_HOST = '34.64.144.19'
 
-        // 컨테이너 정보 정의
+        /* Container Info */
         CONTAINER_NAME = 'osondoson-backend'
         CONTAINER_PORT = 3500
     }

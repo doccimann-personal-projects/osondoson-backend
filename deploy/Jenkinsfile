@@ -23,9 +23,14 @@ pipeline {
             }
         }
 
-        stage('Docker build') {
+        stage('Docker images') {
             steps {
                 sh 'docker images'
+            }
+        }
+
+        stage('Docker build') {
+            steps {
                 sh "docker build -t ${ECR_REPO}:latest ."
             }
         }

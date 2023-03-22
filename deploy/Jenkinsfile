@@ -67,7 +67,7 @@ pipeline {
                                     sudo chmod 777 /var/run/docker.sock
                                     aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.ap-northeast-2.amazonaws.com/
                                     docker pull ${ECR_REPO}:latest
-                                    if [[ $(docker ps -a --filter name=${CONTAINER_NAME} --format "{{.Names}}") == ${CONTAINER_NAME} ]]; then
+                                    if [[ \$(docker ps -a --filter name=${CONTAINER_NAME} --format "{{.Names}}") == ${CONTAINER_NAME} ]]; then
                                         docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
                                     fi
                                     docker run -d -p ${CONTAINER_PORT}:${CONTAINER_PORT} --name ${CONTAINER_NAME} ${ECR_REPO}:latest

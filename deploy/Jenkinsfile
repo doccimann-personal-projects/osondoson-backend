@@ -16,7 +16,7 @@ pipeline {
 
         stage("Append .env file") {
             steps {
-                withCredentials([file(credentialsId: 'dotenv', variable: 'DOTENV_FILE')]) {
+                withCredentials([file(credentialsId: 'osondoson-backend-env', variable: 'DOTENV_FILE')]) {
                     sh "cat ${DOTENV_FILE} >> .env"
                 }
             }

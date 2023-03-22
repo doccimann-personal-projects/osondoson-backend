@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                sh 'git checkout develop'
+                sh 'git checkout develop && git pull origin develop'
             }
         }
 

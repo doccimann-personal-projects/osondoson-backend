@@ -57,7 +57,7 @@ pipeline {
                     sshagent(credentials: ["${VM_ENTER_CREDENTIAL_ID}"]) {
                         withCredentials([usernamePassword(credentialsId: "${OSONDOSON_VM_CREDENTIAL_ID}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                             sh """
-                                sshpass -p '${PASSWORD}' ssh -o StrictHostKeyChecking=no ${USERNAME}@${TARGET_HOST} '
+                                ssh -o StrictHostKeyChecking=no ${USERNAME}@${TARGET_HOST} '
                                     ls
                                 '
                             """

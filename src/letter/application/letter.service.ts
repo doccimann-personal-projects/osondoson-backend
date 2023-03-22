@@ -1,3 +1,4 @@
+import { GetLetterResponse } from './dto/response/letter.view.response';
 import { inject, injectable } from 'inversify';
 import { Letter } from '../domain/letter.entity';
 import { LetterCreateRequest } from './dto/request/letter.create.request';
@@ -6,7 +7,7 @@ import { AppError } from '../../misc/error/error.app';
 import { commonErrors } from '../../misc/error/error.common';
 import { LetterRepository } from '../domain/letter.repository';
 import { LetterCreateResponse } from './dto/response/letter.create.response';
-import { LetterGetResponse } from './dto/response/letter.get.response';
+
 @injectable()
 export class LetterService {
   constructor(
@@ -16,52 +17,64 @@ export class LetterService {
 
   async create(
     createRequest: LetterCreateRequest,
-    authorId: number, 
+    userId: number,
   ): Promise<LetterCreateResponse> {
-    const newLetter: Letter = createRequest.toEntity(authorId);
+    const newLetter: Letter = createRequest.toEntity(userId);
 
     const savedLetter = await this.letterRepository.create(newLetter);
 
     return LetterCreateResponse.fromEntity(savedLetter);
   }
 
-  async deleteAuLetter(id: number): Promise<string | null> {
-    const deleteLetter = await this.letterRepository.deleteAuById(id);
-    //삭제 실패시 null 반환
-    if (!deleteLetter) {
-      return null;
-    }
-    return 'OK';
+  //받은 쪽지의 목록을 반환하는 메소드
+  async getReceivedLetterList(
+    receiverId: number,
+    page: number,
+    limit: number,
+  ): Promise<[GetLetterResponse[], number]> {
+    const [letterList, letterCount] =
+      await this.letterRepository.findReceivedLetters(receiverId, page, limit);
+
+    const letterResponseList = letterList?.map(
+      ({ id, authorId, receiverId, content }) =>
+        new GetLetterResponse(id, authorId, receiverId, content),
+    );
+
+    return [letterResponseList, letterCount];
   }
 
-  //보낸 쪽지 조회하는 메소드
-  async getAuthorMsg(userId: number, sub : number): Promise<LetterGetResponse | null> {
-    if(userId !== sub) {
-      throw new AppError (commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
-    }
-    
-    const foundAuthor = await this.letterRepository.findByAuthorId(userId);
+  // 보낸 쪽지의 목록을 반환하는 메소드
+  async getSentLetterList(
+    authorId: number,
+    page: number,
+    limit: number,
+  ): Promise<[GetLetterResponse[], number]> {
+    const [letterList, letterCount] =
+      await this.letterRepository.findSentLetters(authorId, page, limit);
 
-    const foundAuthorResponse = 
-      foundAuthor && foundAuthor.isDeletedByAuthor ===false
-        ? LetterGetResponse.fromEntity(foundAuthor)
-        : null;
-    return foundAuthorResponse;
+    const letterResponseList = letterList?.map(
+      ({ id, authorId, receiverId, content }) =>
+        new GetLetterResponse(id, authorId, receiverId, content),
+    );
+
+    return [letterResponseList, letterCount];
   }
 
-  //받은 쪽지 조회하는 메소드
-  async getReceiverMsg(userId :  number, sub : number) : Promise<LetterGetResponse | null> {
-    // 토큰에 있는 userId 와 param으로 부터 받아온 userId가 일치하지 않으면 예외 처리
-    if( userId !== sub ) {
-      throw new AppError (commonErrors.INPUT_ERROR, 400, '잘못된 유저 정보입니다.');
-    }
+  // 받은 쪽지를 삭제하는 메소드
+  async deleteReceivedLetter(letterId: number): Promise<string | null> {
+    const deletedLetter = await this.letterRepository.deleteReceivedLetter(
+      letterId,
+    );
 
-    const foundReceiveer = await this.letterRepository.findByReceiverId(userId);
+    return deletedLetter ? 'OK' : null;
+  }
 
-    const foundReceiverResponse = 
-      foundReceiveer && foundReceiveer.isDeletedByReceiver === false
-      ? LetterGetResponse.fromEntity(foundReceiveer)
-      : null;
-    return foundReceiverResponse;
+  // 보낸 편지를 삭제하는 메소드
+  async deleteSentLetter(letterId: number): Promise<string | null> {
+    const deletedLetter = await this.letterRepository.deleteSentLetter(
+      letterId,
+    );
+
+    return deletedLetter ? 'OK' : null;
   }
 }

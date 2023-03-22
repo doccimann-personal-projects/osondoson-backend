@@ -23,15 +23,9 @@ pipeline {
             }
         }
 
-        stage('Docker images') {
-            steps {
-                sh 'docker images'
-            }
-        }
-
         stage('Docker build') {
             steps {
-                sh "docker build -t ${ECR_REPO}:latest ."
+                sh "docker build --no-cache -t ${ECR_REPO}:latest ."
             }
         }
     }

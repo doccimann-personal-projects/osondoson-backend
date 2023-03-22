@@ -25,7 +25,7 @@ pipeline {
 
         stage('Check the dto') {
             steps {
-                sh 'cd src/letter/application/dto'
+                sh 'cd src/letter/application && ls'
             }
         }
 

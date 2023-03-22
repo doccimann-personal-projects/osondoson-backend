@@ -3,8 +3,6 @@ import { inject, injectable } from 'inversify';
 import { Letter } from '../domain/letter.entity';
 import { LetterCreateRequest } from './dto/request/letter.create.request';
 import { Types } from '../../app/container/types.di';
-import { AppError } from '../../misc/error/error.app';
-import { commonErrors } from '../../misc/error/error.common';
 import { LetterRepository } from '../domain/letter.repository';
 import { LetterCreateResponse } from './dto/response/letter.create.response';
 

@@ -1,5 +1,4 @@
 import { Letter } from '../../../domain/letter.entity';
-import { Request } from 'express';
 import { IsString, IsNotEmpty, MaxLength, MinLength, IsNumber } from 'class-validator';
 
 export class LetterCreateRequest {

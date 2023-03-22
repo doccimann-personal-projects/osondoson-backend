@@ -9,7 +9,7 @@ import boardRouter from '../community/boards/router';
 import commentRouter from '../community/comments/router';
 import { connectMongoDB } from '../loader/connection';
 import letterRouter from '../letter/router';
-import researchRouter from '../data/router';
+import researchRouter from '../research/router';
 export class ExpressApp {
   // express app을 반환
   static async of(): Promise<Express> {
@@ -35,11 +35,8 @@ export class ExpressApp {
     expressApp.use('/api/users', userRouter);
     expressApp.use('/api/boards', boardRouter);
     expressApp.use('/api', commentRouter);
-<<<<<<< HEAD
     expressApp.use('/api/letters', letterRouter);
     expressApp.use('/api/researches', researchRouter);
-=======
->>>>>>> b7f5082113551af4d4874a85501664e416ad9a07
 
     // 허용되지 않은 요청을 처리하는 라우터
     expressApp.use(

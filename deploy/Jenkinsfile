@@ -23,6 +23,12 @@ pipeline {
             }
         }
 
+        stage('Check the dto') {
+            steps {
+                sh 'cd src/letter/application/dto'
+            }
+        }
+
         stage('Docker build') {
             steps {
                 sh "docker build --no-cache -t ${ECR_REPO}:latest ."

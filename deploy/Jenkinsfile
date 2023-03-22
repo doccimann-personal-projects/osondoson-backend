@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOT_DEV = credentials('osondoson-backend-env') // .env 파일의 환경 변수를 빌드 환경으로 설정
-
         /* Jenkins credentials */
         AWS_CREDENTIAL_ID = 'ecr-user'
         VM_ENTER_CREDENTIAL_ID = 'enter-vm-credential' // elice VM에 접속하기 위한 credential

@@ -8,6 +8,11 @@ pipeline {
 
         AWS_CREDENTIAL_ID = 'ecr-user'
         REGION = 'ap-northeast-2'
+
+        // elice VM에 접속하기 위한 credential
+        VM_ENTER_CREDENTIAL_ID = 'enter-vm-credential'
+        // VM 자체에 대한 credential (사용자 이름, 패스워드)
+        OSONDOSON_VM_CREDENTIAL_ID = 'osondoson-vm-credential'
     }
 
     stages {
@@ -33,12 +38,31 @@ pipeline {
             }
         }
 
-        stage("Push to ECR") {
+        stage('Push to ECR') {
             steps {
                 script {
                     // docker push
                     docker.withRegistry("https://${ECR_REPO}", "ecr:${REGION}:${AWS_CREDENTIAL_ID}") {
                         docker.image("${ECR_REPO}:latest").push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to VM') {
+            steps {
+                script {
+                    // VM에 대한 인증 정보
+                    def vmCredentials = credentials("${OSONDOSON_VM_CREDENTIAL_ID}")
+                    // AWS 인증 정보
+                    // def awsCredentials = credentials("${AWS_CREDENTIAL_ID}")
+
+                    sshagent(["${VM_ENTER_CREDENTIAL_ID}"]) {
+                        sh "ssh ${vmCredentials.username}@${vmCredentials.host}"
+
+                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: "${AWS_CREDENTIAL_ID}", secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                            
+                        }
                     }
                 }
             }

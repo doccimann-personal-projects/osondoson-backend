@@ -3,22 +3,29 @@ pipeline {
 
     environment {
         // .env 파일의 환경 변수를 빌드 환경으로 설정
-        dotenv = credentials('osondoson-backend-env')
+        DOT_DEV = credentials('osondoson-backend-env')
+        ECR_REPO = '014276069644.dkr.ecr.ap-northeast-2.amazonaws.com/osondoson-backend'
     }
 
     stages {
-        stage("Checkout") {
+        stage('Checkout') {
             steps {
                 checkout scm
-                sh "git checkout develop"
+                sh 'git checkout develop'
             }
         }
 
-        stage("Append .env file") {
+        stage('Append .env file') {
             steps {
                 withCredentials([file(credentialsId: 'osondoson-backend-env', variable: 'DOTENV_FILE')]) {
                     sh "cat ${DOTENV_FILE} >> .env"
                 }
+            }
+        }
+
+        stage('Docker build') {
+            steps {
+                sh "docker build -t ${ECR_REPO}:latest ."
             }
         }
     }

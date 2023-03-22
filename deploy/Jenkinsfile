@@ -56,7 +56,7 @@ pipeline {
                 script {
                     def sshCredentials = credentials("${VM_ENTER_CREDENTIAL_ID}")
 
-                    sshagent(credentials: ["${VM_ENTER_CREDENTIAL_ID}"]) {
+                    sshagent([sshCredentials]) {
                         withCredentials([usernamePassword(credentialsId: "${OSONDOSON_VM_CREDENTIAL_ID}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                             sh """
                                 sshpass -p '${PASSWORD}' ssh -o StrictHostKeyChecking=no -i ${sshCredentials} ${USERNAME}@${TARGET_HOST} '

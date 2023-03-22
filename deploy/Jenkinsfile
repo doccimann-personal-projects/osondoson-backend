@@ -13,6 +13,8 @@ pipeline {
         VM_ENTER_CREDENTIAL_ID = 'enter-vm-credential'
         // VM 자체에 대한 credential (사용자 이름, 패스워드)
         OSONDOSON_VM_CREDENTIAL_ID = 'osondoson-vm-credential'
+        // VM 호스트
+        TARGET_HOST = "34.64.144.19"
     }
 
     stages {
@@ -52,16 +54,15 @@ pipeline {
         stage('Deploy to VM') {
             steps {
                 script {
-                    // VM에 대한 인증 정보
-                    def vmCredentials = credentials("${OSONDOSON_VM_CREDENTIAL_ID}")
-                    // AWS 인증 정보
-                    // def awsCredentials = credentials("${AWS_CREDENTIAL_ID}")
+                    def sshCredentials = credentials("${VM_ENTER_CREDENTIAL_ID}")
 
-                    sshagent(["${VM_ENTER_CREDENTIAL_ID}"]) {
-                        sh "ssh ${vmCredentials.username}@${vmCredentials.host}"
-
-                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: "${AWS_CREDENTIAL_ID}", secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                            
+                    sshagent(credentials: ["${VM_ENTER_CREDENTIAL_ID}"]) {
+                        withCredentials([usernamePassword(credentialsId: "${OSONDOSON_VM_CREDENTIAL_ID}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                            sh """
+                                sshpass -p '${PASSWORD}' ssh -o StrictHostKeyChecking=no -i ${sshCredentials} ${USERNAME}@${TARGET_HOST} '
+                                    ls
+                                '
+                            """
                         }
                     }
                 }

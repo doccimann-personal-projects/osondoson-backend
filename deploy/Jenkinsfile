@@ -10,6 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                deleteDir() // 이전에 가져온 소스 코드를 모두 삭제
                 checkout scm
                 sh 'git checkout develop'
             }
@@ -20,12 +21,6 @@ pipeline {
                 withCredentials([file(credentialsId: 'osondoson-backend-env', variable: 'DOTENV_FILE')]) {
                     sh "cat ${DOTENV_FILE} >> .env"
                 }
-            }
-        }
-
-        stage('Check the dto') {
-            steps {
-                sh 'cd src/letter/application && ls'
             }
         }
 

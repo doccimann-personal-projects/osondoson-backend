@@ -1,11 +1,24 @@
 pipeline {
     agent any
 
+    environment {
+        // .env 파일의 환경 변수를 빌드 환경으로 설정
+        dotenv = credentials('osondoson-backend-env')
+    }
+
     stages {
         stage("Checkout") {
             steps {
                 checkout scm
                 sh "git checkout develop"
+            }
+        }
+
+        stage("Append .env file") {
+            steps {
+                withCredentials([file(credentialsId: 'dotenv', variable: 'DOTENV_FILE')]) {
+                    sh "cat ${DOTENV_FILE} >> .env"
+                }
             }
         }
     }

@@ -70,11 +70,24 @@ export class LetterRepository {
     return await deletedLetter.save();
   }
 
+  async deleteSentLetter(id: number): Promise<Letter | null> {
+    const letterRepository = await this.getLetterRepository();
+
+    const foundLetter = await letterRepository.findOneBy({ id: id });
+
+    // 만약 편지가 존재하지 않으면 null을 바로 반환
+    if (!foundLetter) return null;
+
+    // 발신자에 의해서 삭제된 편지를 반환해준다
+    const deletedLetter = foundLetter.deleteByAuthor();
+
+    return await deletedLetter.save();
+  }
+
   // connection을 통해서 repository를 가져오는 메소드
   async getLetterRepository(): Promise<Repository<Letter>> {
     const connection = await getConnection();
 
     return connection.getRepository(Letter);
   }
-
 }

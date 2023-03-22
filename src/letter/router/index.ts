@@ -1,18 +1,18 @@
+import { Router } from 'express';
+import { LetterController } from '../presentation/letter.controller';
 import {
   checkLetterCreatable,
   checkIsValidUser,
 } from './../presentation/letter.middleware';
-import { Router } from 'express';
+import { LetterCreateRequest } from '../application/dto/request/letter.create.request';
+import { verifyAccessToken } from '../../user/presentation/user.middleware';
+import container from '../../app/container/container';
+import { Types } from '../../app/container/types.di';
+import { validateBody } from '../../misc/utils/validate.util';
 import {
   paginatedResponseMiddleware,
   responseMiddleware,
 } from '../../misc/utils/response.util';
-import { validateBody } from '../../misc/utils/validate.util';
-import container from '../../app/container/container';
-import { LetterCreateRequest } from '../application/dto/request/letter.create.request';
-import { LetterController } from '../presentation/letter.controller';
-import { Types } from '../../app/container/types.di';
-import { verifyAccessToken } from '../../user/presentation/user.middleware';
 
 const letterRouter: Router = Router({ mergeParams: true });
 const letterController: LetterController = container.get<LetterController>(
@@ -54,6 +54,15 @@ letterRouter.delete(
   verifyAccessToken,
   checkIsValidUser,
   letterController.deleteReceivedLetter,
+  responseMiddleware,
+);
+
+// 발신자에 의해서 편지를 삭제하는 endpoint
+letterRouter.delete(
+  '/:id/outbox',
+  verifyAccessToken,
+  checkIsValidUser,
+  letterController.deleteSentLetter,
   responseMiddleware,
 );
 

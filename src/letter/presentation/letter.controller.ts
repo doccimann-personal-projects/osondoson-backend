@@ -103,4 +103,20 @@ export class LetterController {
       next(error);
     }
   }
+
+  // 발신된 편지를 삭제하는 메소드
+  async deleteSentLetter(req: Request, res: Response, next: NextFunction) {
+    try {
+      const letterService = container.get<LetterService>(Types.LETTER_SERVICE);
+
+      const { id } = req.params;
+
+      const deleteResult = await letterService.deleteSentLetter(Number(id));
+
+      res.locals.data = deleteResult;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
 }

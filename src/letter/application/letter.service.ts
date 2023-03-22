@@ -17,7 +17,7 @@ export class LetterService {
 
   async create(
     createRequest: LetterCreateRequest,
-    userId: number
+    userId: number,
   ): Promise<LetterCreateResponse> {
     const newLetter: Letter = createRequest.toEntity(userId);
 
@@ -49,7 +49,8 @@ export class LetterService {
     page: number,
     limit: number,
   ): Promise<[GetLetterResponse[], number]> {
-    const [letterList, letterCount] = await this.letterRepository.findSentLetters(authorId, page, limit);
+    const [letterList, letterCount] =
+      await this.letterRepository.findSentLetters(authorId, page, limit);
 
     const letterResponseList = letterList?.map(
       ({ id, authorId, receiverId, content }) =>
@@ -61,7 +62,18 @@ export class LetterService {
 
   // 받은 쪽지를 삭제하는 메소드
   async deleteReceivedLetter(letterId: number): Promise<string | null> {
-    const deletedLetter = await this.letterRepository.deleteReceivedLetter(letterId);
+    const deletedLetter = await this.letterRepository.deleteReceivedLetter(
+      letterId,
+    );
+
+    return deletedLetter ? 'OK' : null;
+  }
+
+  // 보낸 편지를 삭제하는 메소드
+  async deleteSentLetter(letterId: number): Promise<string | null> {
+    const deletedLetter = await this.letterRepository.deleteSentLetter(
+      letterId,
+    );
 
     return deletedLetter ? 'OK' : null;
   }

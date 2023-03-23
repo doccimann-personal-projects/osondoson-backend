@@ -1,6 +1,6 @@
 import { LetterInboxResponse } from './dto/response/letter.inbox.response';
 import { UserRepository } from './../../user/domain/user.repository';
-import { GetLetterResponse } from './dto/response/letter.view.response';
+import { LetterOutboxResponse } from './dto/response/letter.outbox.response';
 import { inject, injectable } from 'inversify';
 import { Letter } from '../domain/letter.entity';
 import { LetterCreateRequest } from './dto/request/letter.create.request';
@@ -53,16 +53,18 @@ export class LetterService {
     authorId: number,
     page: number,
     limit: number,
-  ): Promise<[GetLetterResponse[], number]> {
-    const [letterList, letterCount] =
+  ): Promise<[LetterOutboxResponse[], number]> {
+    const [letterList, totalElements] =
       await this.letterRepository.findSentLetters(authorId, page, limit);
 
-    const letterResponseList = letterList?.map(
-      ({ id, authorId, receiverId, content }) =>
-        new GetLetterResponse(id, authorId, receiverId, content),
-    );
+    // letterList가 비어있는 경우 빈 리스트와
+    if (letterList.length === 0) {
+      return [[], totalElements];
+    }
 
-    return [letterResponseList, letterCount];
+    const outboxResponseList = await this.getOutboxResponseList(letterList);
+
+    return [outboxResponseList, totalElements];
   }
 
   // 받은 쪽지를 삭제하는 메소드
@@ -88,11 +90,13 @@ export class LetterService {
     letterList: Letter[],
   ): Promise<LetterInboxResponse[]> {
     const authorIdList = letterList.map((letter) => letter.authorId);
-    
+
     // id 중복 제거
     const uniqueAuthorIdList = this.getUniqueNumberList(authorIdList);
 
-    const authorList = await this.userRepository.findManyByIds(uniqueAuthorIdList);
+    const authorList = await this.userRepository.findManyByIds(
+      uniqueAuthorIdList,
+    );
 
     const userIdNameMap = this.getUserIdNameMap(authorList);
 
@@ -103,6 +107,34 @@ export class LetterService {
           authorId,
           userIdNameMap[authorId],
           receiverId,
+          content,
+          createdAt,
+        ),
+    );
+  }
+
+  // letterList로부터 LetterOutboxResponse를 뽑아오는 메소드
+  private async getOutboxResponseList(
+    letterList: Letter[],
+  ): Promise<LetterOutboxResponse[]> {
+    const receiverIdList = letterList.map((letter) => letter.receiverId);
+
+    // id 중복 제거
+    const uniqueReceiverIdList = this.getUniqueNumberList(receiverIdList);
+
+    const receiverList = await this.userRepository.findManyByIds(
+      uniqueReceiverIdList,
+    );
+
+    const userIdNameMap = this.getUserIdNameMap(receiverList);
+
+    return letterList.map(
+      ({ id, authorId, receiverId, content, createdAt }) =>
+        new LetterOutboxResponse(
+          id,
+          authorId,
+          receiverId,
+          userIdNameMap[receiverId],
           content,
           createdAt,
         ),

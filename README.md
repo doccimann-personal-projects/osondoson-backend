@@ -13,3 +13,5 @@ npm i
 # PM2 설치
 npm i -g pm2
 ~~~
+
+예시

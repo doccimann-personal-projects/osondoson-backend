@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { injectable } from 'inversify';
 import { User } from './user.entity';
 
@@ -29,15 +29,27 @@ export class UserRepository {
     });
   }
 
-  async deleteById(userId: number): Promise<User | null> {
-     const targetUser = await this.findById(userId);
+  async findManyByIds(idList: number[]): Promise<User[]> {
+    const userRepository = await this.getRepository();
 
-     if (!targetUser) return null;
+    return await userRepository.createQueryBuilder('user')
+      .where('user.id IN (:...idList)', { idList })
+      .getMany();
+  }
+
+  async deleteById(userId: number): Promise<User | null> {
+     const foundUser = await this.findById(userId);
+
+     if (!foundUser) return null;
 
      // soft-delete 정책 적용
-     targetUser.deletedAt = new Date();
-     targetUser.isDeleted = true;
+     const targetUser = foundUser.softDelete();
 
      return await targetUser.save();
+  }
+
+  private async getRepository(): Promise<Repository<User>> {
+    const connection = await getConnection();
+    return connection.getRepository(User);
   }
 }

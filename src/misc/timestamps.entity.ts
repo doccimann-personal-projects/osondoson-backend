@@ -7,14 +7,14 @@ import {
 } from 'typeorm';
 
 export class TimestampsEntity extends BaseEntity {
-  @CreateDateColumn()
-  createdAt!: Date;
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
 
-  @UpdateDateColumn({ nullable: true })
+  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
   updatedAt: Date | null = null;
 
   // 기본 값은 null로 설정
-  @DeleteDateColumn()
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deletedAt: Date | null = null;
 
   // 기본 값은 false로 설정

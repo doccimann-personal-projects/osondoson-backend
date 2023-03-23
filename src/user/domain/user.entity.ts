@@ -44,4 +44,12 @@ export class User extends TimestampsEntity {
     this.birthDate = birthDate;
     this.role = role;
   }
+
+  // soft-delete 정책에 의해 User를 삭제하는 메소드
+  softDelete(): User {
+    this.deletedAt = new Date();
+    this.isDeleted = true;
+
+    return this;
+  }
 }

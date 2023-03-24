@@ -63,7 +63,7 @@ export class BoardRepository {
     return result;
   }
 
-  async findBoardById(id: string): Promise<BoardsTypes | null> {
+  async findBoardById(id: string,sub:string): Promise<BoardsTypes | null> {
     const board = await Boards.findOne({ _id: id });
     if (!board) {
       return null;
@@ -75,6 +75,7 @@ export class BoardRepository {
       participantInfo: board.participantInfo,
       authorId: board.authorId,
       createdAt: board.createdAt,
+      userId: sub
     };
 
     return result;

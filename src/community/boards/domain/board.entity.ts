@@ -57,5 +57,6 @@ export interface BoardsTypes {
   updatedAt?: Date;
   deletedAt?: Date;
   isDeleted?: boolean;
+  userId?:string;
 }
 export const Boards = mongoose.model<BoardsTypes>('boards', Board);

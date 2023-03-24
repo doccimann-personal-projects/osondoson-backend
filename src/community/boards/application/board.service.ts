@@ -48,8 +48,8 @@ export class BoardService {
   }
 
   // 게시판 상세 조회
-  async getBoardData(id: string): Promise<object | null> {
-    const board = await this.boardRepository.findBoardById(id);
+  async getBoardData(id: string, sub:string): Promise<object | null> {
+    const board = await this.boardRepository.findBoardById(id,sub);
 
     return board;
   }

@@ -16,12 +16,13 @@ export class BoardService {
   async createBoard(
     nickname: string,
     registerBoardRequest: RegisterBoardRequest,
+    sub:string
   ): Promise<object> {
     const createdNewBoard = await this.boardRepository.create(nickname, {
       title: registerBoardRequest.title,
       content: registerBoardRequest.content,
       totalCount: registerBoardRequest.totalCount,
-    });
+    },sub);
     return createdNewBoard;
   }
 
@@ -48,8 +49,8 @@ export class BoardService {
   }
 
   // 게시판 상세 조회
-  async getBoardData(id: string, sub:string): Promise<object | null> {
-    const board = await this.boardRepository.findBoardById(id,sub);
+  async getBoardData(id: string): Promise<object | null> {
+    const board = await this.boardRepository.findBoardById(id);
 
     return board;
   }

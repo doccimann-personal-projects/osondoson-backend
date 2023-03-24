@@ -11,6 +11,7 @@ export class BoardRepository {
       content: string;
       totalCount: number;
     },
+    sub: string
   ): Promise<BoardsTypes> {
     const { title, content, totalCount } = boardInfo;
     const createdNewBoard = await Boards.create({
@@ -19,6 +20,7 @@ export class BoardRepository {
       content: content,
       'participantInfo.totalCount': totalCount,
       'participantInfo.userIdList': nickname,
+      userId: sub
     });
     const result: BoardsTypes = {
       _id: createdNewBoard._id,
@@ -63,7 +65,7 @@ export class BoardRepository {
     return result;
   }
 
-  async findBoardById(id: string,sub:string): Promise<BoardsTypes | null> {
+  async findBoardById(id: string): Promise<BoardsTypes | null> {
     const board = await Boards.findOne({ _id: id });
     if (!board) {
       return null;
@@ -75,7 +77,7 @@ export class BoardRepository {
       participantInfo: board.participantInfo,
       authorId: board.authorId,
       createdAt: board.createdAt,
-      userId: sub
+      userId: board.userId
     };
 
     return result;

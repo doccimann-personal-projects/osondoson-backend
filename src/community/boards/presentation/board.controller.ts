@@ -26,6 +26,7 @@ export class BoardController {
     const result = await boardService.createBoard(
       nickname,
       registerBoardRequest,
+      sub
     );
 
     res.locals.data = result;
@@ -55,10 +56,9 @@ export class BoardController {
     next: express.NextFunction,
   ) {
     const boardService = container.get<BoardService>(Types.BOARD_SERVICE);
-    const { sub } = res.locals.tokenPayload;
 
     const id: string = req.params.id;
-    const result = await boardService.getBoardData(id, sub);
+    const result = await boardService.getBoardData(id);
 
     res.locals.data = result;
     next();

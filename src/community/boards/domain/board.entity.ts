@@ -28,6 +28,7 @@ const Board = new mongoose.Schema(
       type: String,
       required: true,
     },
+    userId:{ type:String},
     isDeleted: {
       type: Boolean,
       default: false,
@@ -53,10 +54,10 @@ export interface BoardsTypes {
     currentCount: number;
     userIdList: string[];
   };
+  userId?:string;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
   isDeleted?: boolean;
-  userId?:string;
 }
 export const Boards = mongoose.model<BoardsTypes>('boards', Board);

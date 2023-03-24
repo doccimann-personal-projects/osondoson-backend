@@ -1,17 +1,37 @@
-FROM node:18-alpine
+# FROM node:18-alpine
 
-WORKDIR /opt/app
+# WORKDIR /opt/app
 
+# COPY package*.json ./
+
+# RUN npm install -g pm2
+
+# RUN npm i
+
+# COPY . .
+
+# EXPOSE 3500
+
+# RUN npm run build
+
+# CMD ["pm2-runtime", "dist/bin/index.js"]
+
+# Stage 1
+FROM node:18-alpine as BUILDER
+WORKDIR /app
 COPY package*.json ./
-
-RUN npm install -g pm2
-
-RUN npm i
-
+RUN npm install
 COPY . .
-
-EXPOSE 3500
-
 RUN npm run build
 
+# Stage 2
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY .env ./
+COPY Data ./
+COPY --from=BUILDER /app/dist ./dist
+RUN npm install -g pm2
+EXPOSE 3500
 CMD ["pm2-runtime", "dist/bin/index.js"]

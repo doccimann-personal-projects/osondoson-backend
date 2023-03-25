@@ -117,8 +117,9 @@ export class UserController {
 
       const { userId } = req.params;
       const { sub } = res.locals.tokenPayload;
+      const { password, nickname } = req.body;
       
-      const updateRequest = UserUpdateRequest.of(req);
+      const updateRequest = new UserUpdateRequest(password, nickname);
       const updateResult = await userService.updateUserInfo(sub, Number(userId), updateRequest);
 
       res.locals.data = updateResult;

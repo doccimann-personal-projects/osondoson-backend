@@ -13,7 +13,9 @@ export class UserController {
   async signup(req: Request, res: Response, next: NextFunction) {
     try {
       const userService = container.get<UserService>(Types.USER_SERVICE);
-      const registerRequest = RegisterRequest.of(req);
+      const {email, password, nickname, gender, birthDate} = req.body;
+
+      const registerRequest = new RegisterRequest(email, password, nickname, gender, birthDate);
 
       const signUpResponse = await userService.signUp(registerRequest);
 
@@ -28,7 +30,8 @@ export class UserController {
     try {
       const userService = container.get<UserService>(Types.USER_SERVICE);
 
-      const loginRequest = UserLoginRequest.of(req);
+      const { email, password } = req.body;
+      const loginRequest = new UserLoginRequest(email, password);
 
       const loginResponse = await userService.login(loginRequest);
 
@@ -47,7 +50,7 @@ export class UserController {
       const { sub, role } = res.locals.tokenPayload;
       const refreshToken = req.headers.authorization!;
 
-      const refreshRequest = UserRefreshRequest.of(sub, role, refreshToken);
+      const refreshRequest = new UserRefreshRequest(sub, role, refreshToken);
 
       const refreshResponse =
         await userService.issueNewAccessTokenByRefreshToken(refreshRequest);
@@ -114,8 +117,9 @@ export class UserController {
 
       const { userId } = req.params;
       const { sub } = res.locals.tokenPayload;
+      const { password, nickname } = req.body;
       
-      const updateRequest = UserUpdateRequest.of(req);
+      const updateRequest = new UserUpdateRequest(password, nickname);
       const updateResult = await userService.updateUserInfo(sub, Number(userId), updateRequest);
 
       res.locals.data = updateResult;

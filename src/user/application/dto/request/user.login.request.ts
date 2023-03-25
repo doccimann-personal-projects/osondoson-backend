@@ -11,13 +11,8 @@ export class UserLoginRequest {
   @IsNotEmpty()
   password: string;
 
-  static of(req: Request): UserLoginRequest {
-    const { email, password } = req.body;
-
-    const userLoginRequest = new UserLoginRequest();
-    userLoginRequest.email = email;
-    userLoginRequest.password = password;
-
-    return userLoginRequest;
+  constructor(email: string, password: string) {
+    this.email = email;
+    this.password = password;
   }
 }

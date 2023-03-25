@@ -14,6 +14,11 @@ export class UserUpdateRequest {
   @Length(1, 15)
   nickname?: string;
 
+  constructor(password?: string, nickname?: string) {
+    this.password = password;
+    this.nickname = nickname;
+  }
+
   static of(req: Request): UserUpdateRequest {
     const updateRequest = new UserUpdateRequest();
 

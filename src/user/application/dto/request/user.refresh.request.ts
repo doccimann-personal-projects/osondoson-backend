@@ -7,13 +7,9 @@ export class UserRefreshRequest {
 
     refreshToken: string;
 
-    static of(userId: number, role: Role, refreshToken: string): UserRefreshRequest {
-        const request = new UserRefreshRequest();
-
-        request.userId = userId;
-        request.role = role;
-        request.refreshToken = refreshToken;
-
-        return request;
+    constructor(userId: number, role: Role, refreshToken: string) {
+        this.userId = userId;
+        this.role = role;
+        this.refreshToken = refreshToken;
     }
 }

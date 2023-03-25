@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { BirthDate } from './../../../domain/vo/birthdate.vo';
 import { User } from '../../../domain/user.entity';
 import { Role } from '../../../domain/enum/role.vo';
@@ -37,20 +36,15 @@ export class RegisterRequest {
 
   @IsNotEmpty()
   @IsEnum(Role)
-  role: Role = Role.USER;
+  role: Role;
 
-  static of(req: Request, role?: Role): RegisterRequest {
-    const { email, password, nickname, gender, birthDate } = req.body;
-
-    const registerRequest = new RegisterRequest()
-    registerRequest.email = email;
-    registerRequest.password = password;
-    registerRequest.nickname = nickname;
-    registerRequest.gender = gender;
-    registerRequest.birthDate = birthDate;
-    registerRequest.role = role ??= Role.USER;
-    
-    return registerRequest;
+  constructor(email: string, password: string, nickname: string, gender: Gender, birthDate: BirthDate, role = Role.USER) {
+    this.email = email;
+    this.password = password;
+    this.nickname = nickname;
+    this.gender = gender;
+    this.birthDate = birthDate;
+    this.role = role;
   }
 
   // register dto를 user entity로 변환하는 메소드

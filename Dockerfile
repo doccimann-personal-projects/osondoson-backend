@@ -28,10 +28,8 @@ RUN npm run build
 FROM node:18-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --production
-COPY .env ./
-COPY Data ./
+COPY .env Data ./
 COPY --from=BUILDER /app/dist ./dist
-RUN npm install -g pm2
+RUN npm ci --omit=dev && npm install -g pm2
 EXPOSE 3500
 CMD ["pm2-runtime", "dist/bin/index.js"]

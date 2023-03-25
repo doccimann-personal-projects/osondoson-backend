@@ -28,7 +28,8 @@ export class UserController {
     try {
       const userService = container.get<UserService>(Types.USER_SERVICE);
 
-      const loginRequest = UserLoginRequest.of(req);
+      const { email, password } = req.body;
+      const loginRequest = new UserLoginRequest(email, password);
 
       const loginResponse = await userService.login(loginRequest);
 

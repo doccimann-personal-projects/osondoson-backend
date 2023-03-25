@@ -13,7 +13,9 @@ export class UserController {
   async signup(req: Request, res: Response, next: NextFunction) {
     try {
       const userService = container.get<UserService>(Types.USER_SERVICE);
-      const registerRequest = RegisterRequest.of(req);
+      const {email, password, nickname, gender, birthDate} = req.body;
+
+      const registerRequest = new RegisterRequest(email, password, nickname, gender, birthDate);
 
       const signUpResponse = await userService.signUp(registerRequest);
 

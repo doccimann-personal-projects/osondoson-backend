@@ -1,5 +1,5 @@
 import { TimestampsEntity } from '../../misc/timestamps.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'letters' })
 export class Letter extends TimestampsEntity {
@@ -7,9 +7,11 @@ export class Letter extends TimestampsEntity {
   id: number;
 
   @Column({ type: 'int' })
+  @Index('idx_author_id')
   authorId: number;
 
   @Column({ type: 'int' })
+  @Index('idx_receiver_id')
   receiverId: number;
 
   @Column({ type: 'varchar' })

@@ -48,7 +48,7 @@ export class UserController {
       const { sub, role } = res.locals.tokenPayload;
       const refreshToken = req.headers.authorization!;
 
-      const refreshRequest = UserRefreshRequest.of(sub, role, refreshToken);
+      const refreshRequest = new UserRefreshRequest(sub, role, refreshToken);
 
       const refreshResponse =
         await userService.issueNewAccessTokenByRefreshToken(refreshRequest);
